@@ -1,0 +1,2532 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Puput OS — by Ridho</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Caveat:wght@500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg-1:#FFE5D9;--bg-2:#FFCAD4;--bg-3:#FAB29F;
+  --accent:#E63946;--accent-2:#FF8FA3;--gold:#FFB627;--mint:#06D6A0;--plum:#9B5DE5;
+  --text:#2A1B2D;--text-soft:#6B5563;
+  --glass:rgba(255,255,255,.45);--glass-strong:rgba(255,255,255,.72);
+  --glass-border:rgba(255,255,255,.85);--shadow:rgba(180,80,90,.18);
+  --window-bg:rgba(255,246,240,.94);--window-header:rgba(255,200,200,.55);
+}
+body.night{
+  --bg-1:#0a0e27;--bg-2:#1a1f3a;--bg-3:#2d1b4e;
+  --text:#F5E6E8;--text-soft:#B8A9B5;
+  --glass:rgba(30,30,60,.4);--glass-strong:rgba(30,30,60,.62);
+  --glass-border:rgba(255,255,255,.15);--shadow:rgba(0,0,0,.5);
+  --window-bg:rgba(20,25,50,.94);--window-header:rgba(60,50,100,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'Space Grotesk',sans-serif;color:var(--text);
+  background:
+    linear-gradient(rgba(255,255,255,.12), rgba(255,255,255,.12)),
+    url('ridhoput.jpg') center center / cover no-repeat fixed;
+  overflow:hidden;position:relative;
+  transition:background 1.5s ease,color 1.5s ease;
+}
+body.night{
+  background:
+    linear-gradient(rgba(10,14,39,.55), rgba(10,14,39,.55)),
+    url('ridhoput.jpg') center center / cover no-repeat fixed;
+}
+/* Decorative background blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(60px);opacity:.12;pointer-events:none;z-index:0;transition:opacity 1.5s}
+.blob.b1{width:400px;height:400px;background:#FFB4A2;top:-100px;left:-100px;animation:float 18s ease-in-out infinite}
+.blob.b2{width:350px;height:350px;background:#FFD6E0;bottom:50px;right:-80px;animation:float 22s ease-in-out infinite reverse}
+body.night .blob{opacity:.08}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}}
+
+/* Stars for night */
+.stars{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity 1.5s;z-index:1}
+body.night .stars{opacity:1}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.3}50%{opacity:1}}
+.moon{position:fixed;top:80px;right:60px;width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,#e8e8f0 60%,#c8c8d8);
+  box-shadow:0 0 60px rgba(255,255,255,.4),inset -10px -10px 20px rgba(0,0,0,.15);
+  opacity:0;transition:opacity 1.5s;z-index:2;pointer-events:none}
+body.night .moon{opacity:.95}
+
+/* Top bar */
+.topbar{position:fixed;top:0;left:0;right:0;height:44px;background:var(--glass);
+  backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--glass-border);display:flex;align-items:center;
+  padding:0 18px;z-index:1000}
+.brand{font-family:'Caprasimo',serif;font-size:20px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.brand i{animation:beat 1.4s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}25%{transform:scale(1.2)}40%{transform:scale(1)}}
+.topbar-spacer{flex:1}
+.topbar-status{display:flex;align-items:center;gap:18px;font-size:13px;color:var(--text-soft)}
+.topbar-status span{display:flex;align-items:center;gap:6px}
+.topbar-clock{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+
+/* Desktop */
+.desktop{position:fixed;top:44px;bottom:64px;left:0;right:0;padding:28px;overflow:auto;z-index:5}
+.desktop-icons{display:grid;grid-template-columns:repeat(auto-fill,96px);gap:8px;max-width:900px}
+.desktop-icon{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+  padding:10px 6px;border-radius:12px;transition:all .2s;user-select:none}
+.desktop-icon:hover{background:var(--glass);transform:translateY(-3px)}
+.desktop-icon.active{background:var(--glass-strong)}
+.dicon-img{width:58px;height:58px;display:flex;align-items:center;justify-content:center;
+  font-size:28px;background:var(--glass-strong);border:1px solid var(--glass-border);
+  border-radius:16px;box-shadow:0 6px 16px var(--shadow);position:relative;overflow:hidden}
+.dicon-img::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;
+  background:linear-gradient(180deg,rgba(255,255,255,.4),transparent)}
+.dicon-label{font-size:12px;font-weight:500;color:var(--text);text-align:center;
+  text-shadow:0 1px 3px rgba(255,255,255,.6);max-width:90px;line-height:1.2}
+body.night .dicon-label{text-shadow:0 1px 3px rgba(0,0,0,.6)}
+
+/* Window */
+.window{position:absolute;background:var(--window-bg);
+  backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--glass-border);border-radius:14px;
+  box-shadow:0 25px 70px var(--shadow),0 0 0 1px rgba(255,255,255,.08) inset;
+  overflow:hidden;display:flex;flex-direction:column;min-width:340px;min-height:240px;
+  animation:wOpen .28s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes wOpen{from{transform:scale(.86) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.window.minimizing{animation:wMin .25s ease-in forwards}
+@keyframes wMin{to{transform:scale(.5) translateY(80vh);opacity:0}}
+.window-header{background:var(--window-header);padding:9px 14px;display:flex;align-items:center;gap:10px;cursor:move;user-select:none;border-bottom:1px solid var(--glass-border)}
+.window-controls{display:flex;gap:6px}
+.wbtn{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;transition:transform .15s}
+.wbtn:hover{transform:scale(1.25)}
+.wbtn.close{background:#FF5F57}.wbtn.min{background:#FEBC2E}.wbtn.max{background:#28C840}
+.window-title{font-size:13px;font-weight:600;flex:1;text-align:center;color:var(--text)}
+.window-body{flex:1;overflow:auto;position:relative}
+.window-body::-webkit-scrollbar{width:8px;height:8px}
+.window-body::-webkit-scrollbar-thumb{background:var(--accent-2);border-radius:4px;opacity:.5}
+.window-body::-webkit-scrollbar-track{background:transparent}
+
+/* Taskbar */
+.taskbar{position:fixed;bottom:0;left:0;right:0;height:60px;background:var(--glass);
+  backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);
+  border-top:1px solid var(--glass-border);display:flex;align-items:center;padding:0 16px;gap:8px;z-index:1000}
+.start-btn{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(230,57,70,.45);transition:transform .2s}
+.start-btn:hover{transform:scale(1.06)}
+.start-btn.active{transform:scale(.94)}
+.taskbar-apps{display:flex;gap:6px;flex:1;overflow-x:auto}
+.taskbar-app{width:44px;height:44px;border-radius:10px;background:var(--glass-strong);
+  border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;transition:all .2s;position:relative;flex-shrink:0}
+.taskbar-app:hover{transform:translateY(-4px);background:#fff}
+body.night .taskbar-app:hover{background:rgba(255,255,255,.15)}
+.taskbar-app.active::after{content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;background:var(--accent);border-radius:50%}
+.taskbar-clock{font-weight:600;color:var(--text);font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.taskbar-clock small{display:block;font-size:11px;color:var(--text-soft);font-weight:400}
+
+/* Start menu */
+.start-menu{position:fixed;bottom:70px;left:16px;width:340px;background:var(--window-bg);
+  backdrop-filter:blur(30px) saturate(180%);-webkit-backdrop-filter:blur(30px) saturate(180%);
+  border:1px solid var(--glass-border);border-radius:16px;
+  box-shadow:0 20px 60px var(--shadow);padding:18px;z-index:1100;
+  opacity:0;transform:translateY(20px) scale(.95);pointer-events:none;transition:all .25s}
+.start-menu.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.start-menu h3{font-family:'Caprasimo';font-size:18px;color:var(--accent);margin-bottom:12px}
+.start-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.start-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;
+  border-radius:10px;cursor:pointer;transition:background .2s;font-size:11px;text-align:center}
+.start-item:hover{background:var(--glass)}
+.start-item i{font-size:22px}
+
+/* Generic UI inside windows */
+.app-pad{padding:22px}
+.app-h{font-family:'Caprasimo';font-size:24px;color:var(--accent);margin-bottom:6px}
+.app-sub{font-size:13px;color:var(--text-soft);margin-bottom:18px;line-height:1.5}
+.btn{padding:10px 18px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;
+  font-size:14px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(230,57,70,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(230,57,70,.5)}
+.btn-soft{background:var(--glass-strong);color:var(--text);border:1px solid var(--glass-border)}
+.btn-soft:hover{background:#fff}
+body.night .btn-soft:hover{background:rgba(255,255,255,.15)}
+
+/* Games grid */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.game-card{padding:16px 12px;background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:14px;cursor:pointer;transition:all .25s;text-align:center}
+.game-card:hover{transform:translateY(-4px) rotate(-1deg);background:var(--glass-strong)}
+.game-card .ico{font-size:36px;margin-bottom:8px}
+.game-card .ttl{font-weight:600;font-size:14px}
+.game-card .desc{font-size:11px;color:var(--text-soft);margin-top:4px}
+
+/* Snake / 2048 / Flappy canvas */
+canvas.game-canvas{display:block;margin:0 auto;background:#1a1a2e;border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.score-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;
+  padding:8px 14px;background:var(--glass);border-radius:10px;font-weight:600}
+.score-bar .pill{background:var(--accent);color:#fff;padding:3px 10px;border-radius:8px;font-size:12px}
+
+/* 2048 */
+.g2048-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:rgba(180,80,90,.15);
+  padding:8px;border-radius:10px;width:320px;margin:0 auto}
+.g2048-cell{aspect-ratio:1;background:rgba(255,255,255,.4);border-radius:8px;display:flex;
+  align-items:center;justify-content:center;font-weight:700;font-size:24px;transition:all .12s;
+  font-family:'Caprasimo'}
+.g2048-cell[data-v="2"]{background:#FFE5D9;color:#5a3a2a}
+.g2048-cell[data-v="4"]{background:#FFCAD4;color:#5a3a2a}
+.g2048-cell[data-v="8"]{background:#FF8FA3;color:#fff}
+.g2048-cell[data-v="16"]{background:#E63946;color:#fff}
+.g2048-cell[data-v="32"]{background:#FFB627;color:#fff}
+.g2048-cell[data-v="64"]{background:#F77F00;color:#fff}
+.g2048-cell[data-v="128"]{background:#9B5DE5;color:#fff;font-size:22px}
+.g2048-cell[data-v="256"]{background:#06D6A0;color:#fff;font-size:22px}
+.g2048-cell[data-v="512"]{background:#118AB2;color:#fff;font-size:22px}
+.g2048-cell[data-v="1024"]{background:#073B4C;color:#fff;font-size:20px}
+.g2048-cell[data-v="2048"]{background:#FFD700;color:#fff;font-size:20px;box-shadow:0 0 20px #FFD700}
+
+/* Tic Tac Toe */
+.ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:280px;margin:0 auto}
+.ttt-cell{aspect-ratio:1;background:var(--glass);border:2px solid var(--glass-border);
+  border-radius:12px;font-size:48px;font-family:'Caprasimo';cursor:pointer;display:flex;
+  align-items:center;justify-content:center;transition:all .2s;color:var(--accent)}
+.ttt-cell:hover{background:var(--glass-strong)}
+.ttt-cell.x{color:#E63946}.ttt-cell.o{color:#118AB2}
+
+/* Memory card */
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:340px;margin:0 auto}
+.mem-card{aspect-ratio:1;cursor:pointer;perspective:600px}
+.mem-inner{width:100%;height:100%;position:relative;transition:transform .5s;transform-style:preserve-3d}
+.mem-card.flipped .mem-inner,.mem-card.matched .mem-inner{transform:rotateY(180deg)}
+.mem-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;display:flex;
+  align-items:center;justify-content:center;font-size:32px;border:2px solid var(--glass-border)}
+.mem-front{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+.mem-back{background:#fff;transform:rotateY(180deg)}
+body.night .mem-back{background:#2a2f4a;color:#fff}
+
+/* Tebak Emoji */
+.emoji-q{font-size:60px;text-align:center;margin:20px 0}
+.emoji-options{display:grid;gap:8px;max-width:380px;margin:0 auto}
+
+/* Simon Says */
+.simon-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:240px;margin:0 auto}
+.simon-btn{aspect-ratio:1;border:none;border-radius:14px;cursor:pointer;opacity:.65;transition:opacity .08s,transform .08s}
+.simon-btn.lit{opacity:1;transform:scale(1.06);box-shadow:0 0 24px currentColor}
+.simon-btn.s-red{background:#E63946}.simon-btn.s-blue{background:#118AB2}
+.simon-btn.s-green{background:#06D6A0}.simon-btn.s-yellow{background:#FFB627}
+
+/* Whack-a-Mole */
+.whack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:300px;margin:0 auto}
+.whack-hole{aspect-ratio:1;background:rgba(139,90,43,.25);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:34px;border:3px solid rgba(139,90,43,.45);user-select:none}
+
+/* Connect Four */
+.c4-board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:320px;margin:0 auto;background:#118AB2;padding:10px;border-radius:12px}
+.c4-cell{aspect-ratio:1;background:rgba(255,255,255,.22);border-radius:50%;cursor:pointer;transition:background .15s}
+.c4-cell.red{background:#E63946}.c4-cell.yellow{background:#FFB627}
+
+/* Rock Paper Scissors */
+.rps-btns{display:flex;gap:14px;justify-content:center;margin:18px 0}
+.rps-btn{font-size:38px;width:72px;height:72px;border-radius:50%;border:2px solid var(--glass-border);background:var(--glass);cursor:pointer;transition:all .2s}
+.rps-btn:hover{transform:scale(1.08);background:var(--glass-strong)}
+.rps-result{font-family:'Caprasimo';font-size:22px;text-align:center;color:var(--accent);min-height:32px;margin:10px 0}
+
+/* Word Scramble */
+.scramble-word{font-family:'Caprasimo';font-size:30px;text-align:center;color:var(--accent);letter-spacing:5px;margin:18px 0}
+.scramble-input{width:100%;max-width:280px;padding:12px;border-radius:10px;border:2px solid var(--glass-border);font-family:inherit;font-size:16px;text-align:center;margin:0 auto;display:block;background:var(--glass-strong)}
+
+/* Reaction */
+.react-box{width:280px;height:160px;margin:0 auto;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Caprasimo';font-size:20px;cursor:pointer;user-select:none;transition:background .15s}
+.react-box.wait{background:#E63946;color:#fff}
+.react-box.ready{background:#FFB627;color:#fff}
+.react-box.go{background:#06D6A0;color:#fff;animation:reactPulse .5s infinite alternate}
+@keyframes reactPulse{from{transform:scale(1)}to{transform:scale(1.02)}}
+
+/* Win overlay */
+.win-overlay{position:absolute;inset:0;background:rgba(255,255,255,.85);
+  backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:10;text-align:center;padding:20px;animation:wOpen .4s}
+body.night .win-overlay{background:rgba(20,25,50,.85)}
+.win-overlay h2{font-family:'Caprasimo';font-size:32px;color:var(--accent);margin-bottom:8px}
+.win-overlay p{font-size:16px;color:var(--text);margin-bottom:6px;font-family:'Caveat';font-size:22px}
+.win-overlay .hug{font-size:60px;margin:10px 0;animation:beat 1.4s infinite}
+
+/* Daily Surprise */
+.daily-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:16px}
+.daily-card{padding:18px 12px;border-radius:14px;text-align:center;cursor:pointer;
+  transition:all .25s;position:relative;overflow:hidden;background:var(--glass);border:1px solid var(--glass-border)}
+.daily-card.unlocked{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+.daily-card.locked{opacity:.5;cursor:not-allowed}
+.daily-card.today{box-shadow:0 0 0 3px var(--gold);animation:pulseToday 2s infinite}
+@keyframes pulseToday{0%,100%{box-shadow:0 0 0 3px var(--gold)}50%{box-shadow:0 0 0 6px rgba(255,182,39,.5)}}
+.daily-card .day{font-size:11px;opacity:.8}
+.daily-card .ico{font-size:32px;margin:8px 0}
+.daily-card .label{font-weight:600;font-size:13px}
+
+/* Anonymous message */
+.anon-box{min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:30px;background:var(--glass);border-radius:14px;border:1px dashed var(--accent);
+  margin:18px 0;position:relative;overflow:hidden}
+.anon-box::before{content:'💌';position:absolute;top:10px;left:14px;font-size:24px;opacity:.4}
+.anon-msg{font-family:'Caveat';font-size:26px;line-height:1.4;color:var(--text);max-width:400px}
+.anon-typing{display:inline-block;border-right:2px solid var(--accent);animation:blink 1s infinite}
+@keyframes blink{50%{border-color:transparent}}
+
+/* Sleep mode */
+.sleep-overlay{position:fixed;inset:0;background:linear-gradient(180deg,#0a0e27,#1a1f3a,#2d1b4e);
+  z-index:5000;display:none;flex-direction:column;align-items:center;justify-content:center;
+  color:#fff;text-align:center;padding:30px}
+.sleep-overlay.active{display:flex}
+.sleep-overlay h2{font-family:'Caprasimo';font-size:36px;margin-bottom:12px}
+.sleep-overlay p{font-family:'Caveat';font-size:22px;max-width:500px;line-height:1.5;margin-bottom:20px}
+.rain-bg{position:absolute;inset:0;pointer-events:none;opacity:.4}
+
+/* Virtual pet */
+.pet-stage{background:linear-gradient(180deg,#FFF1E6,#FFD6E0);border-radius:14px;padding:24px;
+  text-align:center;position:relative;overflow:hidden;min-height:280px}
+body.night .pet-stage{background:linear-gradient(180deg,#1a1f3a,#2d1b4e)}
+.pet-char{font-size:120px;animation:petBob 3s ease-in-out infinite;display:inline-block;position:relative}
+@keyframes petBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+.pet-bubble{position:absolute;top:20px;right:20px;background:#fff;padding:10px 14px;border-radius:14px;
+  font-family:'Caveat';font-size:18px;max-width:180px;box-shadow:0 4px 12px rgba(0,0,0,.1);
+  animation:bubbleIn .4s}
+.pet-bubble::after{content:'';position:absolute;bottom:-8px;left:30px;border:8px solid transparent;border-top-color:#fff}
+body.night .pet-bubble{background:#2a2f4a;color:#fff}
+body.night .pet-bubble::after{border-top-color:#2a2f4a}
+@keyframes bubbleIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.pet-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.pet-stat{background:var(--glass);padding:10px;border-radius:10px;text-align:center}
+.pet-stat .lbl{font-size:11px;color:var(--text-soft);margin-bottom:4px}
+.pet-stat .bar{height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden}
+.pet-stat .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .5s}
+.pet-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* Calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.cal-head{text-align:center;font-size:12px;font-weight:600;color:var(--text-soft);padding:8px 0}
+.cal-cell{aspect-ratio:1;background:var(--glass);border-radius:8px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .2s;position:relative}
+.cal-cell:hover{background:var(--glass-strong);transform:scale(1.05)}
+.cal-cell.empty{background:transparent;cursor:default}
+.cal-cell.today{background:var(--accent);color:#fff;font-weight:700}
+.cal-cell.special{background:var(--gold);color:#fff;font-weight:700}
+.cal-cell.special::after{content:'❤';position:absolute;top:2px;right:4px;font-size:10px}
+.cal-cell.other-month{opacity:.3}
+
+/* Wheel of Love */
+.wheel-stage{text-align:center;padding:20px}
+.wheel{width:300px;height:300px;margin:0 auto;position:relative;transition:transform 4s cubic-bezier(.2,.8,.3,1)}
+.wheel svg{width:100%;height:100%;filter:drop-shadow(0 10px 30px rgba(0,0,0,.2))}
+.wheel-pointer{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:30px;z-index:2;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.wheel-result{margin-top:20px;padding:16px;background:var(--glass);border-radius:12px;font-family:'Caveat';
+  font-size:22px;min-height:60px;display:flex;align-items:center;justify-content:center}
+
+/* AI Chat */
+.chat-box{display:flex;flex-direction:column;height:100%}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:75%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.4;animation:msgIn .3s}
+@keyframes msgIn{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+.chat-msg.bot{background:var(--glass-strong);align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg.user{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-quick{display:flex;gap:6px;padding:8px 12px;flex-wrap:wrap;border-top:1px solid var(--glass-border)}
+.chat-quick button{padding:6px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-border);
+  cursor:pointer;font-size:12px;font-family:inherit;color:var(--text)}
+.chat-quick button:hover{background:var(--glass-strong)}
+.chat-input{display:flex;padding:10px;border-top:1px solid var(--glass-border);gap:8px}
+.chat-input input{flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--glass-border);
+  background:var(--glass);font-family:inherit;font-size:14px;color:var(--text)}
+.chat-input button{padding:0 16px;border-radius:10px;background:var(--accent);color:#fff;border:none;cursor:pointer}
+
+/* Polaroid wall */
+.polaroid-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px;padding:10px}
+.polaroid{background:#fff;padding:10px 10px 30px;border-radius:4px;box-shadow:0 6px 16px rgba(0,0,0,.15);
+  cursor:pointer;transition:all .3s;transform:rotate(var(--rot,-2deg))}
+.polaroid:nth-child(2n){--rot:2deg}.polaroid:nth-child(3n){--rot:-1deg}.polaroid:nth-child(4n){--rot:3deg}
+.polaroid:hover{transform:rotate(0) translateY(-6px) scale(1.04);box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:5}
+.polaroid img{width:100%;aspect-ratio:1;object-fit:cover;background:#eee;display:block;filter:saturate(.9)}
+.polaroid .cap{font-family:'Caveat';font-size:18px;text-align:center;margin-top:6px;color:#333}
+
+/* Radio */
+.radio-stage{padding:20px}
+.radio-visual{width:160px;height:160px;margin:0 auto 20px;position:relative}
+.radio-disc{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,#333 0%,#333 30%,#1a1a1a 31%,#333 32%,#1a1a1a 50%,#333 51%,#1a1a1a 70%,#333 71%,#1a1a1a 100%);
+  position:relative;animation:spin 4s linear infinite;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.radio-disc.paused{animation-play-state:paused}
+.radio-disc::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:40px;height:40px;border-radius:50%;background:var(--accent)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.radio-cats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.radio-cat{padding:14px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-border);
+  cursor:pointer;text-align:center;transition:all .2s}
+.radio-cat:hover{transform:translateY(-2px)}
+.radio-cat.active{background:var(--accent);color:#fff}
+.radio-cat .ico{font-size:24px;margin-bottom:4px}
+.radio-cat .ttl{font-size:13px;font-weight:600}
+.radio-now{padding:14px;background:var(--glass);border-radius:12px;text-align:center}
+.eq{display:flex;gap:3px;justify-content:center;align-items:flex-end;height:30px;margin:10px 0}
+.eq span{width:4px;background:var(--accent);border-radius:2px;animation:eq 1s ease-in-out infinite}
+.eq span:nth-child(1){animation-delay:0s;height:60%}
+.eq span:nth-child(2){animation-delay:.2s;height:90%}
+.eq span:nth-child(3){animation-delay:.4s;height:40%}
+.eq span:nth-child(4){animation-delay:.6s;height:80%}
+.eq span:nth-child(5){animation-delay:.1s;height:50%}
+.eq.paused span{animation-play-state:paused}
+@keyframes eq{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
+
+/* Gallery */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:10px}
+.gallery-item{aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .2s}
+.gallery-item:hover{transform:scale(1.05)}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Notes */
+.notes-list{padding:14px}
+.note-item{padding:14px;background:#FFF8DC;border-radius:8px;margin-bottom:10px;cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);transform:rotate(-.5deg);transition:transform .2s;
+  font-family:'Caveat';font-size:18px}
+.note-item:nth-child(2n){background:#FFE5D9;transform:rotate(.8deg)}
+.note-item:nth-child(3n){background:#E0F4FF;transform:rotate(-.3deg)}
+.note-item:hover{transform:rotate(0) scale(1.02)}
+.note-item .from{font-size:12px;color:#888;font-family:'Space Grotesk';margin-top:6px}
+.note-detail{padding:24px;font-family:'Caveat';font-size:20px;line-height:1.6;white-space:pre-wrap}
+
+/* Secret */
+.secret-locked{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;padding:30px;text-align:center}
+.secret-locked .lock-ico{font-size:80px;margin-bottom:14px;color:var(--accent)}
+.secret-input{padding:12px 16px;border-radius:10px;border:1px solid var(--glass-border);
+  background:var(--glass);font-family:inherit;font-size:14px;margin:10px 0;width:220px;text-align:center;
+  color:var(--text)}
+.secret-content{padding:24px;text-align:center}
+.secret-content h2{font-family:'Caprasimo';color:var(--accent);font-size:24px;margin-bottom:12px}
+.secret-content p{font-family:'Caveat';font-size:22px;line-height:1.5}
+
+/* Recycle bin */
+.recycle-empty{text-align:center;padding:40px;color:var(--text-soft)}
+.recycle-empty i{font-size:60px;margin-bottom:14px;display:block}
+.recycle-item{padding:12px 14px;background:var(--glass);border-radius:8px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+.recycle-item:hover{background:var(--glass-strong)}
+.recycle-item .ico{font-size:24px;opacity:.6}
+
+/* Pet widget */
+.pet-widget{position:fixed;bottom:74px;right:18px;width:60px;height:60px;border-radius:50%;
+  background:var(--glass-strong);border:1px solid var(--glass-border);display:flex;align-items:center;
+  justify-content:center;font-size:30px;cursor:pointer;z-index:100;box-shadow:0 6px 18px var(--shadow);
+  transition:transform .2s}
+.pet-widget:hover{transform:scale(1.1) rotate(10deg)}
+.pet-widget::after{content:attr(data-tip);position:absolute;bottom:70px;right:0;background:var(--text);
+  color:var(--bg-1);padding:6px 10px;border-radius:8px;font-size:11px;font-family:'Caveat';font-size:14px;
+  white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .3s}
+.pet-widget:hover::after{opacity:1}
+
+/* Toast */
+.toast{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);
+  background:var(--text);color:var(--bg-1);padding:12px 20px;border-radius:12px;font-size:14px;
+  z-index:6000;opacity:0;transition:all .3s;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Floating hearts */
+.heart-particle{position:fixed;pointer-events:none;font-size:20px;z-index:9999;
+  animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{transform:translateY(0) scale(0);opacity:0}
+  20%{transform:translateY(-20px) scale(1);opacity:1}
+  100%{transform:translateY(-200px) scale(.5);opacity:0}}
+
+/* Sleep button in topbar */
+.sleep-toggle{cursor:pointer;padding:4px 10px;border-radius:8px;background:var(--glass);
+  border:1px solid var(--glass-border);transition:all .2s}
+.sleep-toggle:hover{background:var(--glass-strong)}
+
+/* Responsive */
+@media(max-width:600px){
+  .desktop-icons{grid-template-columns:repeat(auto-fill,80px);gap:4px}
+  .dicon-img{width:50px;height:50px;font-size:24px}
+  .window{min-width:280px}
+  .topbar-status{gap:10px;font-size:11px}
+  .brand{font-size:17px}
+  .pet-widget{width:50px;height:50px;font-size:24px;bottom:70px;right:10px}
+}
+
+/* Hidden helper */
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+<div class="stars" id="stars"></div>
+<div class="moon"></div>
+
+<header class="topbar">
+  <div class="brand"><i class="fa-solid fa-heart"></i> Puput OS</div>
+  <div class="topbar-spacer"></div>
+  <div class="topbar-status">
+    <span id="modeIndicator"><i class="fa-solid fa-sun"></i> Mode Siang</span>
+    <span class="sleep-toggle" id="sleepToggle" title="Mode Tidur"><i class="fa-solid fa-moon"></i></span>
+    <span class="topbar-clock" id="topClock">--:--</span>
+  </div>
+</header>
+
+<main class="desktop">
+  <div class="desktop-icons" id="desktopIcons"></div>
+</main>
+
+<footer class="taskbar">
+  <button class="start-btn" id="startBtn" aria-label="Start menu"><i class="fa-solid fa-heart"></i></button>
+  <div class="taskbar-apps" id="taskbarApps"></div>
+  <div class="taskbar-clock">
+    <div id="taskbarTime">--:--</div>
+    <small id="taskbarDate">--</small>
+  </div>
+</footer>
+
+<div class="start-menu" id="startMenu">
+  <h3>Puput OS — Menu</h3>
+  <div class="start-grid" id="startGrid"></div>
+</div>
+
+<div id="windowsContainer"></div>
+
+<div class="pet-widget" id="petWidget" data-tip="Aku kangen Puput...">🦫</div>
+
+<div class="sleep-overlay" id="sleepOverlay">
+  <canvas class="rain-bg" id="rainCanvas"></canvas>
+  <h2 id="sleepTitle">🌙 Selamat malam, Puput</h2>
+  <p id="sleepStory"></p>
+  <button class="btn btn-primary" id="sleepClose"><i class="fa-solid fa-moon"></i> Tenangin aku, lalu tutup</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA ============ */
+const MESSAGES = [
+  "Jangan lupa makan ya, Puput.","Aku bangga sama kamu, selalu.","Semangat PKL-nya! Aku di sini terus.",
+  "Kalau capek, inget ada aku yang sayang kamu.","Kamu itu alasan aku senyum hari ini.",
+  "Tidur cukup ya, jangan begadang terus.","Aku kangen suara kamu.","Hari ini pasti akan jadi hari yang baik karena ada kamu.",
+  "Kamu lebih kuat dari yang kamu kira.","Peluk virtual dari Ridho, selalu.","Ingat minum air putih ya.",
+  "Aku mikirin kamu terus, lho.","Kamu itu favoritku, dalam segala hal.","Semoga harimu sehangat pelukanku.",
+  "Kalau sedih, cerita ke aku ya. Aku mendengar.","Kamu lucu kalau lagi kesal, hehe.","Maaf kalau aku kadang nyebelin.",
+  "Aku bersyukur ada kamu di hidupku.","Kamu bikin aku jadi orang yang lebih baik.","Pernah gak kamu sadari, kamu itu berharga?",
+  "Aku simpen foto kamu di hatiku. Cringe ya? gapapa.","Semoga ketemu kita cepat ya.","Aku tunggu cerita harimu, selalu.",
+  "Kamu cantik hari ini. Dan kemarin. Dan besok.","Jangan lupa senyum, kamu lagi paling cantik kalau senyum.",
+  "Kalau capek sama dunia, istirahat di aku ya.","Aku di sini, untuk kamu, selama kamu mau.",
+  "Kadang aku takut kehilanganmu. Tapi aku yakin, kita kuat.","Kamu itu rumah ternyaman buat aku.","Makasih udah ada, Puput."
+];
+const GOMBAL = [
+  "Kamu itu kayak wifi, sinyalnya langsung nyambung ke hatiku.","Aku gak butuh Google, karena semua yang aku cari ada di kamu.",
+  "Kalau kamu sedih, jangan nangis. Nanti aku yang nangis karena gak tega.","Kamu itu seperti kode, bikin kepala pusing tapi bikin hidup berarti.",
+  "Bisa gak aku jadi kalkulator? Biar aku bisa ngerti angka-angka, tapi tetep gak bisa itung betapa banyaknya aku sayang kamu."
+];
+const QUOTES = [
+  "Cinta bukan tentang memiliki, tapi tentang hadir di saat paling dibutuhkan.",
+  "Kamu tidak perlu sempurna untuk dicintai. Cukup jadi dirimu, dan itu sudah cukup.",
+  "Hal-hal kecil yang kamu lakukan setiap hari, itu yang membuatku jatuh hati berulang kali.",
+  "Jarak itu bukan penghalang, kalau hati sudah memilih untuk tetap bersama."
+];
+const STORIES = [
+  "Malam itu, capybara kecil duduk di tepi sungai. Ia menunggu bulan datang. Bulan selalu datang. Seperti aku selalu menunggu kamu, walau beda kota, walau beda langit. Karena kamu itu rumahku, Puput.",
+  "Ada satu rahasia kecil: setiap malam sebelum tidur, aku berdoa cepat. Bukan minta apa-apa. Cuma bilang makasih. Karena di dunia yang ribut ini, aku ketemu kamu.",
+  "Kalau kamu gak bisa tidur, bayangkan kita lagi duduk di bawah langit yang sama. Aku tunjukin bintang-bintang ke kamu. Yang itu namanya Bintang Puput, kataku. Kamu ketawa. Dan tiba-tiba, semua jadi tenang."
+];
+const AI_RESPONSES = {
+  "lagi ngapain":["Lagi mikirin kamu, ini jawaban default-nya.","Lagi buka WhatsApp nunggu chat kamu.","Lagi ngopi sambil lihat foto kamu di galeri.","Lagi dengerin lagu yang bikin ingat kamu."],
+  "kangen":["Aku juga kangen, lebih besar dari semesta.","Kangen aku udah overflow, mau kirim lewat ojek gak ya?","Tunggu ya, nanti kita ketemu. Aku peluk lama-lama."],
+  "makan":["Aku udah makan. Tapi kamu udah belum? Awas gak makan, aku marah.","Makan dulu ya, jangan lupa. Awas.","Makan yang benar ya, jangan yang instan terus."],
+  "sedih":["Kenapa sedih? Cerita ke aku ya. Aku di sini mendengar.","Peluk virtual dulu. Tarik napas. Kamu kuat, Puput.","Aku gak bisa hilangin sedihmu, tapi aku bisa temenin kamu lewat itu."],
+  "capek":["Istirahat ya. Badanmu itu titipan, jaga juga buat aku.","Tidur sebentar. Aku jaga kamu dari jauh.","Capek itu halal, lho. Yang gak halal ngerasa capek terus tanpa istirahat."],
+  "puput":["Puput itu nama orang yang aku sayang. Eh, itu kamu ya.","Puput? Aku kenal. Orangnya lucu, manis, kadang nyebelin tapi bikin kangen."],
+  "ridho":["Ridho? Itu orang yang lagi ngetik ini. Manis banget kan? Eh maaf.","Kenapa Ridho? Dia lagi sibuk mikirin kamu kok."],
+  "sayang":["Aku sayang kamu. Itu tidak berubah, tidak ada deadline.","Sayang kamu itu investasi jangka panjang. Aku hold kok."]
+};
+const AI_DEFAULT = [
+  "Hmm, aku gak terlalu ngerti. Tapi yang penting kamu lagi baikan kan?","Boong kalau aku bilang aku paham. Tapi aku di sini kok.",
+  "Aku Ridho versi kecil. Yang asli bisa jawab lebih manis.","Catet dulu ya, nanti aku tanya yang asli.","Bicara ke aku enak ya? Tapi yang asli lebih enak dipegang."
+];
+const SONG_LYRICS = [
+  "🌙 Malam ini tenang... bayangkan aku di sampingmu, kalau sedih, aku peluk lewat lagu ini.",
+  "⭐ Tutup matamu, tarik napas pelan-pelan. Aku selalu di hatimu, walau jauh di sini.",
+  "🌧 Hujan di luar, hangat di dalam. Karena di hati kita, ada nama yang sama."
+];
+const DAILY_SURPRISES = [
+  {day:1,label:"Gombalan",icon:"💗",type:"text",content:()=>GOMBAL[Math.floor(Math.random()*GOMBAL.length)]},
+  {day:2,label:"Foto Lucu",icon:"📸",type:"image",content:()=>"https://picsum.photos/seed/puput"+Date.now().toString().slice(-4)+"/400/300.jpg"},
+  {day:3,label:"Voice Note",icon:"🎙",type:"voice",content:()=>"Hai Puput, semangat ya hari ini. Aku sayang kamu."},
+  {day:4,label:"Quotes",icon:"✨",type:"text",content:()=>QUOTES[Math.floor(Math.random()*QUOTES.length)]},
+  {day:5,label:"Video Pendek",icon:"🎬",type:"video",content:()=>null},
+  {day:6,label:"Cerita",icon:"📖",type:"story",content:()=>STORIES[Math.floor(Math.random()*STORIES.length)]},
+  {day:7,label:"Lirik Lagu",icon:"🎵",type:"lyrics",content:()=>SONG_LYRICS[Math.floor(Math.random()*SONG_LYRICS.length)]}
+];
+const IMPORTANT_DATES = [
+  {m:0,d:1,label:"Tahun Baru bersamamu"},
+  {m:1,d:14,label:"Valentine"},{m:5,d:1,label:"Hari Jadian Kita"},
+  {m:7,d:17,label:"Ulang Tahun Puput"},{m:9,d:5,label:"Pertama Ketemu"},
+  {m:11,d:25,label:"Natal"}
+];
+const NOTES = [
+  {title:"Untuk Puput, saat badmood",body:"Hai Puput. Aku tahu kadang dunia terasa berat. Kadang PKL capek, kadang orang-orang nyebelin. Tapi ingat ya, kamu punya aku. Aku gak ke mana-mana. Peluk dari jauh dulu. Tarik napas. Kamu hebat, dan aku bangga sama kamu."},
+  {title:"Surat kecil sebelum tidur",body:"Kalau kamu baca ini, berarti kamu masih belum tidur. Tidur Puput. Besok kamu harus semangat lagi. Aku simpen doa baik tiap malam buat kamu. Malam ini sama kayak biasa: semoga kamu bahagia, semoga kamu sehat, semoga kamu tetap jadi orang baik seperti sekarang."},
+  {title:"Saat aku rindu",body:"Aku nulis ini pas lagi kangen kamu parah. Kangen suaramu, kangen tawamu, kangen cara kamu marah-marah halus. Kalau kamu baca ini dan kebetulan lagi kangen juga, kabari aku ya. Sapa aku. Karena aku selalu nunggu."},
+  {title:"Untuk hari yang berat",body:"Puput, kalau hari ini terasa berat banget, inget: kamu udah lewatin banyak hari berat sebelumnya, dan kamu masih di sini. Itu artinya kamu kuat. Aku bangga. Sekarang istirahat, minum air, peluk aku (virtual dulu). Besok baru lanjut."}
+];
+const RECYCLE = [
+  {ico:"💬",name:"Chat yang gagal dikirim.txt",content:"Puput, aku mau bilang... (kirim gagal, sinyal lagi error)."},
+  {ico:"📸",name:"Foto blurry.jpg",content:"Ini foto kita yang pertama, tapi blurred karena tangan getar. Aku simpen masih."},
+  {ico:"📝",name:"Draft marah.docx",content:"Draf ini aku tulis pas kesel sama kamu, tapi gak jadi dikirim karena aku gak tega."},
+  {ico:"🎵",name:"Playlist galau.mp3",content:"Dengerin ini kalau mau sedih dulu. Tapi jangan lama-lama, nanti aku khawatir."},
+  {ico:"❤",name:"Hati yang pernah patah",content:"Aku simpen sisa hati yang pernah patah, biar aku ingat bahwa kamu yang menyembuhkannya."}
+];
+const GAMES_LIST = [
+  {id:"snake",icon:"🐍",title:"Snake",desc:"Klasik, makan apel",render:renderSnake},
+  {id:"2048",icon:"🔢",title:"2048",desc:"Gabung angka",render:render2048},
+  {id:"flappy",icon:"🐤",title:"Flappy Bird",desc:"Terbang melewati pipa",render:renderFlappy},
+  {id:"ttt",icon:"⭕",title:"Tic Tac Toe",desc:"Lawan Ridho AI",render:renderTTT},
+  {id:"emoji",icon:"🤔",title:"Tebak Emoji",desc:"Tebak maksudnya",render:renderEmoji},
+  {id:"memory",icon:"🃏",title:"Memory Card",desc:"Cocokkan kartu",render:renderMemory},
+  {id:"breakout",icon:"🧱",title:"Breakout",desc:"Hancurkan balok",render:renderBreakout},
+  {id:"simon",icon:"🎨",title:"Simon Says",desc:"Ingat urutan warna",render:renderSimon},
+  {id:"whack",icon:"🔨",title:"Whack-a-Mole",desc:"Pukul capybara!",render:renderWhack},
+  {id:"pong",icon:"🏓",title:"Pong",desc:"Lawan Ridho AI",render:renderPong},
+  {id:"connect4",icon:"🔴",title:"Connect Four",desc:"4 catur berturut",render:renderConnect4},
+  {id:"reaction",icon:"⚡",title:"Reaction",desc:"Refleks super cepat",render:renderReaction},
+  {id:"rps",icon:"✊",title:"Batu Gunting",desc:"Best of 5 vs Ridho",render:renderRPS},
+  {id:"catch",icon:"💗",title:"Catch Hearts",desc:"Tangkap hati jatuh",render:renderCatch},
+  {id:"scramble",icon:"🔤",title:"Word Scramble",desc:"Susun kata acak",render:renderScramble}
+];
+const SCRAMBLE_WORDS = [
+  {word:"PUPUT",hint:"Nama favorit Ridho"},
+  {word:"SAYANG",hint:"Perasaan hangat"},
+  {word:"RIDHO",hint:"Pembuat OS ini"},
+  {word:"KANGEN",hint:"Rasa rindu"},
+  {word:"CINTA",hint:"Yang paling penting"},
+  {word:"PELUk",hint:"... virtual dari jauh"},
+  {word:"BAHAGIA",hint:"Yang diharapkan tiap hari"},
+  {word:"JARAK",hint:"Yang kita hadapi"},
+  {word:"KENANGAN",hint:"Disimpan di Memories"},
+  {word:"MANIS",hint:"Kamu kalau senyum"}
+];
+const EMOJI_QUIZ = [
+  {emoji:"👶🍼",ans:"Bayi Minum Susu",opts:["Bayi Minum Susu","Boba Tea","Susu sapi","Anak kucing"]},
+  {emoji:"🌧️☔",ans:"Hujan",opts:["Hujan","Hujan es","Badai","Banjir"]},
+  {emoji:"🦁👑",ans:"Raja Hutan",opts:["Raja Hutan","Singa Petarung","Lion King","Kucing Besar"]},
+  {emoji:"📚🎓",ans:"Kelulusan",opts:["Kelulusan","Sekolah","Hari Guru","Liburan"]},
+  {emoji:"🌙😴",ans:"Tidur",opts:["Tidur","Begadang","Insomnia","Mimpi"]},
+  {emoji:"☕💻",ans:"Kerja di Cafe",opts:["Kerja di Cafe","Nongkrong","Ngoding","Sarapan"]},
+  {emoji:"❤️💌",ans:"Surat Cinta",opts:["Surat Cinta","Valentine","Pacar","Wedding"]},
+  {emoji:"🚗💨",ans:"Balap",opts:["Balap","Mudik","Macet","Kecelakaan"]}
+];
+const PET_STATES = {
+  idle:"🦫",happy:"🦫",sad:"🦫",eating:"🦫",sleeping:"💤"
+};
+
+/* ============ STATE ============ */
+const state = {
+  windows:{},zIndex:100,
+  pet:{hunger:80,happy:80,energy:80,lastFed:Date.now(),lastPet:Date.now()},
+  daily:{lastOpen:null,openedDays:[]},
+  secretUnlocked:false,
+  isNight:false,isSleepMode:false
+};
+
+/* ============ HELPERS ============ */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function toast(msg,dur=2400){
+  const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+function spawnHearts(x,y){
+  for(let i=0;i<5;i++){
+    const h=document.createElement('div');
+    h.className='heart-particle';
+    h.textContent=rand(['❤','🤍','💖','💕']);
+    h.style.left=(x+(Math.random()*40-20))+'px';
+    h.style.top=y+'px';
+    h.style.animationDelay=(i*0.1)+'s';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),2200);
+  }
+}
+
+function isNightTime(){
+  const h=new Date().getHours();
+  return h>=22||h<6;
+}
+
+function formatDate(d){
+  const days=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const months=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+/* ============ WINDOW MANAGER ============ */
+function openWindow(id,title,icon,renderFn,options={}){
+  if(state.windows[id]){
+    focusWindow(id);
+    if(state.windows[id].minimized)toggleMinimize(id);
+    return;
+  }
+  const w=document.createElement('div');
+  w.className='window';
+  w.dataset.id=id;
+  const width=options.width||520;
+  const height=options.height||440;
+  w.style.width=width+'px';
+  w.style.height=height+'px';
+  w.style.zIndex=++state.zIndex;
+  // center-ish, with slight cascade
+  const offset=Object.keys(state.windows).length*24;
+  w.style.left=Math.max(20,(window.innerWidth-width)/2+offset-100)+'px';
+  w.style.top=Math.max(54,(window.innerHeight-height)/2+offset-60)+'px';
+  w.innerHTML=`
+    <div class="window-header">
+      <div class="window-controls">
+        <button class="wbtn close" data-act="close"></button>
+        <button class="wbtn min" data-act="min"></button>
+        <button class="wbtn max" data-act="max"></button>
+      </div>
+      <div class="window-title"><i class="${icon}"></i> ${title}</div>
+      <div style="width:54px"></div>
+    </div>
+    <div class="window-body"></div>
+  `;
+  $('#windowsContainer').appendChild(w);
+  const winObj={el:w,id,title,icon,minimized:false,maximized:false,prevRect:null};
+  state.windows[id]=winObj;
+  // controls
+  w.querySelector('[data-act="close"]').onclick=e=>{e.stopPropagation();closeWindow(id)};
+  w.querySelector('[data-act="min"]').onclick=e=>{e.stopPropagation();toggleMinimize(id)};
+  w.querySelector('[data-act="max"]').onclick=e=>{e.stopPropagation();toggleMaximize(id)};
+  // drag
+  makeDraggable(w,winObj);
+  w.addEventListener('mousedown',()=>focusWindow(id));
+  // render content
+  const body=w.querySelector('.window-body');
+  renderFn(body,winObj);
+  // taskbar
+  updateTaskbar();
+}
+
+function closeWindow(id){
+  const w=state.windows[id];if(!w)return;
+  w.el.classList.add('minimizing');
+  setTimeout(()=>{w.el.remove();delete state.windows[id];updateTaskbar()},250);
+}
+function focusWindow(id){
+  const w=state.windows[id];if(!w)return;
+  w.el.style.zIndex=++state.zIndex;
+  updateTaskbar();
+}
+function toggleMinimize(id){
+  const w=state.windows[id];if(!w)return;
+  if(w.minimized){
+    w.el.style.display='flex';
+    w.minimized=false;
+  }else{
+    w.el.style.display='none';
+    w.minimized=true;
+  }
+  updateTaskbar();
+}
+function toggleMaximize(id){
+  const w=state.windows[id];if(!w)return;
+  if(w.maximized){
+    Object.assign(w.el.style,w.prevRect);
+    w.maximized=false;
+  }else{
+    w.prevRect={left:w.el.style.left,top:w.el.style.top,width:w.el.style.width,height:w.el.style.height};
+    w.el.style.left='10px';w.el.style.top='50px';
+    w.el.style.width=(window.innerWidth-20)+'px';
+    w.el.style.height=(window.innerHeight-120)+'px';
+    w.maximized=true;
+  }
+}
+function makeDraggable(w,winObj){
+  const header=w.querySelector('.window-header');
+  let ox=0,oy=0,dragging=false;
+  header.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('wbtn'))return;
+    if(winObj.maximized)return;
+    dragging=true;
+    const rect=w.getBoundingClientRect();
+    ox=e.clientX-rect.left;oy=e.clientY-rect.top;
+    document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    let x=e.clientX-ox,y=e.clientY-oy;
+    x=Math.max(-w.offsetWidth+100,Math.min(window.innerWidth-100,x));
+    y=Math.max(44,Math.min(window.innerHeight-80,y));
+    w.style.left=x+'px';w.style.top=y+'px';
+  });
+  document.addEventListener('mouseup',()=>{
+    dragging=false;document.body.style.userSelect='';
+  });
+}
+
+/* ============ TASKBAR ============ */
+function updateTaskbar(){
+  const tb=$('#taskbarApps');
+  tb.innerHTML='';
+  Object.values(state.windows).forEach(w=>{
+    const a=document.createElement('div');
+    a.className='taskbar-app'+(w.minimized?'':' active');
+    a.innerHTML=`<i class="${w.icon}"></i>`;
+    a.title=w.title;
+    a.onclick=()=>{
+      if(w.minimized)toggleMinimize(w.id);
+      else focusWindow(w.id);
+    };
+    tb.appendChild(a);
+  });
+}
+
+/* ============ APPS ============ */
+const APPS=[
+  {id:'memories',icon:'fa-solid fa-camera-retro',label:'Memories',color:'#FF6B9D',winIcon:'fa-solid fa-camera-retro',render:openMemories,quick:true},
+  {id:'gallery',icon:'fa-solid fa-images',label:'Gallery',color:'#FF8FA3',winIcon:'fa-solid fa-images',render:openGallery,quick:true},
+  {id:'music',icon:'fa-solid fa-music',label:'Music',color:'#9B5DE5',winIcon:'fa-solid fa-music',render:openRadio,quick:true},
+  {id:'messages',icon:'fa-solid fa-envelope-open-text',label:'Messages',color:'#F15BB5',winIcon:'fa-solid fa-envelope-open-text',render:openMessages,quick:true},
+  {id:'secret',icon:'fa-solid fa-lock',label:'Secret',color:'#2D2D2D',winIcon:'fa-solid fa-lock',render:openSecret,quick:true},
+  {id:'game',icon:'fa-solid fa-gamepad',label:'Game',color:'#FFB627',winIcon:'fa-solid fa-gamepad',render:openGameFolder,quick:true},
+  {id:'notes',icon:'fa-solid fa-note-sticky',label:'Notes',color:'#FEE440',winIcon:'fa-solid fa-note-sticky',render:openNotes,quick:true},
+  {id:'recyclebin',icon:'fa-solid fa-trash',label:'Recycle Bin',color:'#888',winIcon:'fa-solid fa-trash',render:openRecycle,quick:false},
+  {id:'daily',icon:'fa-solid fa-gift',label:'Daily Surprise',color:'#E63946',winIcon:'fa-solid fa-gift',render:openDaily,quick:true},
+  {id:'wheel',icon:'fa-solid fa-circle-notch',label:'Wheel of Love',color:'#06D6A0',winIcon:'fa-solid fa-circle-notch',render:openWheel,quick:true},
+  {id:'ai',icon:'fa-solid fa-robot',label:'AI Ridho',color:'#118AB2',winIcon:'fa-solid fa-robot',render:openAI,quick:true},
+  {id:'pet',icon:'fa-solid fa-paw',label:'Virtual Pet',color:'#FFB627',winIcon:'fa-solid fa-paw',render:openPet,quick:true},
+  {id:'calendar',icon:'fa-solid fa-calendar',label:'Calendar',color:'#EF476F',winIcon:'fa-solid fa-calendar',render:openCalendar,quick:true}
+];
+
+function buildDesktopIcons(){
+  const c=$('#desktopIcons');c.innerHTML='';
+  APPS.forEach(a=>{
+    const el=document.createElement('div');
+    el.className='desktop-icon';
+    el.innerHTML=`<div class="dicon-img" style="color:${a.color}"><i class="${a.icon}"></i></div>
+      <div class="dicon-label">${a.label}</div>`;
+    el.onclick=()=>a.render();
+    el.ondblclick=()=>a.render();
+    c.appendChild(el);
+  });
+}
+
+function buildStartMenu(){
+  const g=$('#startGrid');g.innerHTML='';
+  APPS.forEach(a=>{
+    const it=document.createElement('div');
+    it.className='start-item';
+    it.innerHTML=`<i class="${a.icon}" style="color:${a.color}"></i><span>${a.label}</span>`;
+    it.onclick=()=>{a.render();$('#startMenu').classList.remove('open');$('#startBtn').classList.remove('active')};
+    g.appendChild(it);
+  });
+}
+
+/* ====== FOLDER: MEMORIES (Polaroid Wall) ====== */
+function openMemories(){
+  openWindow('memories','Memories — Polaroid Wall','fa-solid fa-camera-retro',(body)=>{
+    body.innerHTML=`<div class="app-pad"><div class="app-h">📸 Dinding Polaroid</div>
+      <div class="app-sub">Setiap foto punya cerita. Klik untuk membacanya.</div>
+      <div class="polaroid-wall" id="polaroidWall"></div></div>`;
+    const wall=body.querySelector('#polaroidWall');
+    const photos=[
+      {seed:'puput1',cap:"Pertama kali ketemu",story:"Waktu itu kamu pakai baju putih, rambut di-iket. Aku gak nyangka orang secantik itu bakal jadi orang paling penting dalam hidupku."},
+      {seed:'puput2',cap:"Kopi pertama",story:"Kamu pesan Americano, aku pesan Caramel Latte. Kita ngobrol 3 jam, dan aku baru sadar aku gak pernah lihat jam."},
+      {seed:'puput3',cap:"Hujan tanggal tua",story:"Kita berteduh di depan Indomaret. Kamu kedinginin, aku kasih jaket. Dari situ aku tau, aku sayang kamu."},
+      {seed:'puput4',cap:"Ketawa kamu",story:"Ini foto pas kamu ketawa lepas karena aku jatoh dari kursi. Aku sakit, tapi lihat kamu ketawa, gak apa-apa deh."},
+      {seed:'puput5',cap:"Mata kamu",story:"Aku suka mata kamu. Kadang liatnya galak, tapi kalau lagi senyum, seluruh dunia ikut senyum."},
+      {seed:'puput6',cap:"Senja di lapangan",story:"Kita duduk di rumput, lihat langit jadi oranye. Kamu bilang 'cantik ya'. Aku jawab 'iya, kamu cantik'."},
+      {seed:'puput7',cap:"Pertama pegangan tangan",story:"Tangan kamu dingin. Aku genggam pelan. Kamu gak lepas. Aku gak pernah mau lepas sejak itu."},
+      {seed:'puput8',cap:"Foto jelek kamu",story:"Kamu gak suka foto ini. Tapi aku suka. Karena ini kamu yang paling natural, paling kamu."}
+    ];
+    photos.forEach(p=>{
+      const el=document.createElement('div');
+      el.className='polaroid';
+      el.innerHTML=`<img src="https://picsum.photos/seed/${p.seed}/300/300.jpg" alt="${p.cap}" loading="lazy"><div class="cap">${p.cap}</div>`;
+      el.onclick=()=>{
+        spawnHearts(el.getBoundingClientRect().left+50,el.getBoundingClientRect().top+50);
+        openWindow('memorystory'+p.seed,'Cerita Foto','fa-solid fa-image',(b)=>{
+          b.innerHTML=`<div class="app-pad" style="text-align:center">
+            <img src="https://picsum.photos/seed/${p.seed}/300/300.jpg" style="border-radius:8px;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.2)">
+            <h3 style="font-family:'Caprasimo';color:var(--accent);margin:14px 0 8px">${p.cap}</h3>
+            <p style="font-family:'Caveat';font-size:20px;line-height:1.6;color:var(--text)">${p.story}</p>
+            <p style="margin-top:14px;font-size:13px;color:var(--text-soft)">— Ridho 🤍</p>
+          </div>`;
+        },{width:380,height:520});
+      };
+      wall.appendChild(el);
+    });
+  },{width:680,height:520});
+}
+
+/* ====== FOLDER: GALLERY ====== */
+function openGallery(){
+  openWindow('gallery','Gallery','fa-solid fa-images',(body)=>{
+    body.innerHTML=`<div class="app-pad"><div class="app-h">🖼️ Gallery</div>
+      <div class="app-sub">Kumpulan foto-foto kita (dan yang aku suka dari kamu).</div>
+      <div class="gallery-grid" id="galleryGrid"></div></div>`;
+    const g=body.querySelector('#galleryGrid');
+    for(let i=1;i<=6;i++){
+      const el=document.createElement('div');
+      el.className='gallery-item';
+      el.innerHTML=`<img src="${i}.jpg" loading="lazy" alt="Foto ${i}">`;
+      el.onclick=()=>{
+        openWindow('galfull'+i,'Foto','fa-solid fa-image',(b)=>{
+          b.innerHTML=`<div style="padding:14px;text-align:center">
+            <img src="${i}.jpg" style="max-width:100%;border-radius:8px">
+            <p style="font-family:'Caveat';font-size:18px;margin-top:10px">Foto #${i} — kenangan yang aku simpan.</p>
+          </div>`;
+        },{width:520,height:520});
+      };
+      g.appendChild(el);
+    }
+  },{width:560,height:480});
+}
+
+/* ====== FOLDER: MUSIC (Radio) ====== */
+let audioCtx=null,currentRadio={cat:null,playing:false,osc:null,gain:null};
+function openRadio(){
+  openWindow('music','Radio — Puput FM','fa-solid fa-music',(body)=>{
+    body.innerHTML=`<div class="radio-stage">
+      <div class="app-h">🎧 Puput FM</div>
+      <div class="app-sub">Pilih kategori sesuai mood. Suara di-generate langsung, bukan file eksternal.</div>
+      <div class="radio-visual"><div class="radio-disc paused" id="radioDisc"></div></div>
+      <div class="eq paused" id="radioEq"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="radio-cats">
+        <div class="radio-cat" data-cat="belajar"><div class="ico">📚</div><div class="ttl">Belajar</div></div>
+        <div class="radio-cat" data-cat="tidur"><div class="ico">🌙</div><div class="ttl">Tidur</div></div>
+        <div class="radio-cat" data-cat="kangen"><div class="ico">💗</div><div class="ttl">Kangen</div></div>
+        <div class="radio-cat" data-cat="galau"><div class="ico">🌧</div><div class="ttl">Galau</div></div>
+      </div>
+      <div class="radio-now" id="radioNow">Belum ada yang diputar. Pilih kategori dulu.</div>
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+        <button class="btn btn-soft" id="radioPlay"><i class="fa-solid fa-play"></i> Putar</button>
+        <button class="btn btn-soft" id="radioStop"><i class="fa-solid fa-stop"></i> Stop</button>
+      </div>
+    </div>`;
+    const cats=body.querySelectorAll('.radio-cat');
+    const disc=body.querySelector('#radioDisc');
+    const eq=body.querySelector('#radioEq');
+    const now=body.querySelector('#radioNow');
+    const playBtn=body.querySelector('#radioPlay');
+    const stopBtn=body.querySelector('#radioStop');
+    const catData={
+      belajar:{name:"Belajar Mix",desc:"Lofi untuk teman belajar kamu",freq:220,mod:0.3},
+      tidur:{name:"Tidur Nyenyak",desc:"Suara lembut bikin cepat alpukat... eh alpuku",freq:110,mod:0.1},
+      kangen:{name:"Kangen Kamu",desc:"Tiap nada adalah detak yang nunggu kamu",freq:330,mod:0.5},
+      galau:{name:"Galau Puput",desc:"Galau sedikit gak apa-apa, yang penting aku ada",freq:180,mod:0.7}
+    };
+    cats.forEach(c=>c.onclick=()=>{
+      cats.forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      currentRadio.cat=c.dataset.cat;
+      const d=catData[currentRadio.cat];
+      now.innerHTML=`<strong>${d.name}</strong><br><small>${d.desc}</small>`;
+      playRadio(d);
+    });
+    playBtn.onclick=()=>{
+      if(!currentRadio.cat){toast("Pilih kategori dulu ya");return;}
+      playRadio(catData[currentRadio.cat]);
+    };
+    stopBtn.onclick=()=>stopRadio();
+    function playRadio(d){
+      stopRadioInternal();
+      if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      const osc=audioCtx.createOscillator();
+      const gain=audioCtx.createGain();
+      const lfo=audioCtx.createOscillator();
+      const lfoGain=audioCtx.createGain();
+      osc.type='sine';osc.frequency.value=d.freq;
+      lfo.frequency.value=d.mod;
+      lfoGain.gain.value=8;
+      lfo.connect(lfoGain);lfoGain.connect(osc.frequency);
+      gain.gain.value=0.05;
+      osc.connect(gain);gain.connect(audioCtx.destination);
+      osc.start();lfo.start();
+      currentRadio.osc=osc;currentRadio.gain=gain;currentRadio.lfo=lfo;
+      currentRadio.playing=true;
+      disc.classList.remove('paused');
+      eq.classList.remove('paused');
+      playBtn.innerHTML='<i class="fa-solid fa-pause"></i> Putar';
+    }
+    function stopRadioInternal(){
+      if(currentRadio.osc){
+        try{currentRadio.osc.stop();currentRadio.lfo.stop()}catch(e){}
+        currentRadio.osc=null;currentRadio.lfo=null;
+      }
+      currentRadio.playing=false;
+      disc.classList.add('paused');
+      eq.classList.add('paused');
+      playBtn.innerHTML='<i class="fa-solid fa-play"></i> Putar';
+    }
+    function stopRadio(){stopRadioInternal();now.innerHTML="<small>Sudah dihentikan.</small>"}
+  },{width:460,height:580});
+}
+
+/* ====== FOLDER: MESSAGES (Anonymous Message) ====== */
+function openMessages(){
+  openWindow('messages','Messages — Anonymous','fa-solid fa-envelope-open-text',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="app-h">💌 Anonymous Message</div>
+      <div class="app-sub">"Hari ini Ridho mau bilang apa ya?" Klik tombol di bawah, muncul pesan acak.</div>
+      <div class="anon-box"><div class="anon-msg" id="anonMsg">Klik tombol di bawah ya...</div></div>
+      <div style="text-align:center">
+        <button class="btn btn-primary" id="anonBtn"><i class="fa-solid fa-envelope-open"></i> Hari ini Ridho mau bilang apa ya?</button>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:12px;color:var(--text-soft)">
+        Ada <strong>${MESSAGES.length}</strong> pesan yang sudah Ridho siapkan untuk kamu.
+      </div>
+    </div>`;
+    const msgEl=body.querySelector('#anonMsg');
+    const btn=body.querySelector('#anonBtn');
+    let typing=false;
+    btn.onclick=async()=>{
+      if(typing)return;
+      typing=true;
+      msgEl.innerHTML='';
+      const msg=rand(MESSAGES);
+      for(let i=0;i<msg.length;i++){
+        msgEl.innerHTML=msg.slice(0,i+1)+'<span class="anon-typing"></span>';
+        await sleep(28);
+      }
+      msgEl.innerHTML=msg;
+      spawnHearts(btn.getBoundingClientRect().left+btn.offsetWidth/2,btn.getBoundingClientRect().top);
+      typing=false;
+    };
+  },{width:520,height:480});
+}
+
+/* ====== FOLDER: SECRET (password) ====== */
+function openSecret(){
+  if(state.secretUnlocked){
+    openSecretContent();
+    return;
+  }
+  openWindow('secret','Secret Folder','fa-solid fa-lock',(body)=>{
+    body.innerHTML=`<div class="secret-locked">
+      <div class="lock-ico"><i class="fa-solid fa-lock"></i></div>
+      <h3 style="font-family:'Caprasimo';color:var(--accent)">Folder Rahasia</h3>
+      <p style="font-size:13px;color:var(--text-soft);max-width:280px;margin-bottom:10px">
+        Folder ini berisi hal-hal yang cuma untuk Puput. Masukkan password untuk membuka.</p>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:6px"><em>Hint: nama orang yang membuat web ini (huruf kecil)</em></p>
+      <input type="password" class="secret-input" id="secretInput" placeholder="Masukkan password" autocomplete="off">
+      <button class="btn btn-primary" id="secretUnlock"><i class="fa-solid fa-key"></i> Buka</button>
+      <p id="secretError" style="color:var(--accent);font-size:12px;margin-top:8px;height:14px"></p>
+    </div>`;
+    const input=body.querySelector('#secretInput');
+    const btn=body.querySelector('#secretUnlock');
+    const err=body.querySelector('#secretError');
+    const tryUnlock=()=>{
+      if(input.value.trim().toLowerCase()==='ridho'){
+        state.secretUnlocked=true;
+        closeWindow('secret');
+        setTimeout(openSecretContent,300);
+      }else{
+        err.textContent="Password salah. Coba lagi ya.";
+        input.value='';
+        input.focus();
+      }
+    };
+    btn.onclick=tryUnlock;
+    input.onkeydown=e=>{if(e.key==='Enter')tryUnlock()};
+    setTimeout(()=>input.focus(),300);
+  },{width:420,height:420});
+}
+function openSecretContent(){
+  openWindow('secretContent','Secret — Untuk Puput','fa-solid fa-heart',(body)=>{
+    body.innerHTML=`<div class="secret-content">
+      <h2>🤍 Hal yang Belum Pernah Kubilang</h2>
+      <p>Halaman ini aku buat tersembunyi, karena isinya cuma untuk kamu.</p>
+      <p style="margin-top:14px">Aku ingin kamu tahu, setiap kali aku bikin koding ini, aku ngebayangin kamu senyum. Dan itu cukup buat aku semangat ngerjain sampai selesai.</p>
+      <p style="margin-top:14px">Kamu itu bukan pacar biasa buat aku. Kamu itu alasan aku mau jadi versi yang lebih baik. Yang lebih sabar, yang lebih lembut, yang lebih bertanggung jawab.</p>
+      <p style="margin-top:14px">Makasih udah ada, Puput. Makasih udah mau buka folder ini, berarti kamu penasaran sama aku. Aku suka itu.</p>
+      <p style="margin-top:20px;font-family:'Caprasimo';color:var(--accent)">— Ridho 🤍</p>
+    </div>`;
+  },{width:480,height:520});
+}
+
+/* ====== FOLDER: GAME ====== */
+function openGameFolder(){
+  openWindow('game','Game — Puput Arcade','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="app-h">🎮 Puput Arcade</div>
+      <div class="app-sub">Pilih game. Kalau menang, hadiahmu spesial dari Ridho.</div>
+      <div class="games-grid" id="gamesGrid"></div>
+    </div>`;
+    const grid=body.querySelector('#gamesGrid');
+    GAMES_LIST.forEach(g=>{
+      const c=document.createElement('div');
+      c.className='game-card';
+      c.innerHTML=`<div class="ico">${g.icon}</div><div class="ttl">${g.title}</div><div class="desc">${g.desc}</div>`;
+      c.onclick=()=>g.render();
+      grid.appendChild(c);
+    });
+  },{width:640,height:560});
+}
+
+function showWinOverlay(parent,msg="Selamat, hadiahmu: peluk virtual dari Ridho 🤍"){
+  const o=document.createElement('div');
+  o.className='win-overlay';
+  o.innerHTML=`<div class="hug">🤗</div>
+    <h2>Kamu Menang!</h2>
+    <p>${msg}</p>
+    <button class="btn btn-primary" id="winCloseBtn">Yeay 🤍</button>`;
+  parent.appendChild(o);
+  o.querySelector('#winCloseBtn').onclick=()=>{
+    spawnHearts(window.innerWidth/2,window.innerHeight/2);
+    o.remove();
+  };
+  setTimeout(()=>spawnHearts(window.innerWidth/2,window.innerHeight/2),300);
+}
+
+/* ====== GAME: SNAKE ====== */
+function renderSnake(){
+  openWindow('snake','Snake','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🐍 Snake</span><span class="pill" id="snakeScore">0</span></div>
+      <canvas id="snakeCanvas" class="game-canvas" width="320" height="320"></canvas>
+      <div style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-soft)">Gunakan tombol panah / WASD</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="snakeRestart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const canvas=body.querySelector('#snakeCanvas');
+    const ctx=canvas.getContext('2d');
+    const scoreEl=body.querySelector('#snakeScore');
+    const GRID=16;const CELLS=20;
+    let snake,dir,nextDir,food,score,loop,running,won;
+    function reset(){
+      snake=[{x:8,y:8}];dir={x:1,y:0};nextDir=dir;score=0;won=false;
+      placeFood();scoreEl.textContent=score;running=true;
+      if(loop)clearInterval(loop);
+      loop=setInterval(tick,100);
+    }
+    function placeFood(){
+      do{food={x:Math.floor(Math.random()*CELLS),y:Math.floor(Math.random()*CELLS)}}while(snake.some(s=>s.x===food.x&&s.y===food.y));
+    }
+    function tick(){
+      if(!running)return;
+      dir=nextDir;
+      const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+      if(head.x<0||head.x>=CELLS||head.y<0||head.y>=CELLS||snake.some(s=>s.x===head.x&&s.y===head.y)){
+        running=false;clearInterval(loop);
+        ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,320,320);
+        ctx.fillStyle='#fff';ctx.font='20px Space Grotesk';ctx.textAlign='center';
+        ctx.fillText('Game Over!',160,150);ctx.font='14px Space Grotesk';
+        ctx.fillText('Skor: '+score,160,180);
+        return;
+      }
+      snake.unshift(head);
+      if(head.x===food.x&&head.y===food.y){
+        score++;scoreEl.textContent=score;
+        if(score>=15&&!won){won=true;running=false;clearInterval(loop);showWinOverlay(body.querySelector('.app-pad'))}
+        else placeFood();
+      }else snake.pop();
+      draw();
+    }
+    function draw(){
+      ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,320,320);
+      // food
+      ctx.fillStyle='#E63946';
+      ctx.beginPath();ctx.arc(food.x*GRID+8,food.y*GRID+8,6,0,Math.PI*2);ctx.fill();
+      // snake
+      snake.forEach((s,i)=>{
+        ctx.fillStyle=i===0?'#06D6A0':'#FFB627';
+        ctx.fillRect(s.x*GRID+1,s.y*GRID+1,14,14);
+      });
+    }
+    const keyHandler=e=>{
+      const k=e.key.toLowerCase();
+      if((k==='arrowup'||k==='w')&&dir.y!==1)nextDir={x:0,y:-1};
+      else if((k==='arrowdown'||k==='s')&&dir.y!==-1)nextDir={x:0,y:1};
+      else if((k==='arrowleft'||k==='a')&&dir.x!==1)nextDir={x:-1,y:0};
+      else if((k==='arrowright'||k==='d')&&dir.x!==-1)nextDir={x:1,y:0};
+      if(['arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
+    };
+    document.addEventListener('keydown',keyHandler);
+    body.querySelector('#snakeRestart').onclick=reset;
+    // cleanup on close
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){clearInterval(loop);document.removeEventListener('keydown',keyHandler);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:380,height:480});
+}
+
+/* ====== GAME: 2048 ====== */
+function render2048(){
+  openWindow('2048','2048','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🔢 2048</span><span class="pill" id="g2048Score">0</span></div>
+      <div class="g2048-grid" id="g2048Grid"></div>
+      <div style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-soft)">Gunakan tombol panah / WASD. Gabung sampai 2048.</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="g2048Restart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const gridEl=body.querySelector('#g2048Grid');
+    const scoreEl=body.querySelector('#g2048Score');
+    let grid,score,won;
+    function reset(){
+      grid=Array(4).fill(0).map(()=>Array(4).fill(0));score=0;won=false;
+      addRandom();addRandom();draw();
+    }
+    function addRandom(){
+      const empty=[];
+      for(let i=0;i<4;i++)for(let j=0;j<4;j++)if(grid[i][j]===0)empty.push([i,j]);
+      if(empty.length===0)return;
+      const [i,j]=rand(empty);
+      grid[i][j]=Math.random()<0.9?2:4;
+    }
+    function draw(){
+      gridEl.innerHTML='';
+      for(let i=0;i<4;i++)for(let j=0;j<4;j++){
+        const v=grid[i][j];
+        const c=document.createElement('div');
+        c.className='g2048-cell';c.textContent=v||'';
+        if(v)c.dataset.v=v;
+        gridEl.appendChild(c);
+      }
+      scoreEl.textContent=score;
+    }
+    function slide(row){
+      const f=row.filter(v=>v);const missing=4-f.length;
+      const zeros=Array(missing).fill(0);
+      let merged=[];let gained=0;
+      for(let i=0;i<f.length;i++){
+        if(f[i]===f[i+1]&&i<f.length-1){
+          merged.push(f[i]*2);gained+=f[i]*2;i++;
+        }else merged.push(f[i]);
+      }
+      while(merged.length<4)merged.push(0);
+      return{row:merged,gained};
+    }
+    function move(dir){
+      if(won)return;
+      let moved=false;
+      const old=JSON.stringify(grid);
+      if(dir==='left'){
+        for(let i=0;i<4;i++){const r=slide(grid[i]);grid[i]=r.row;score+=r.gained}
+      }else if(dir==='right'){
+        for(let i=0;i<4;i++){
+          const r=slide(grid[i].reverse());
+          grid[i]=r.row.reverse();
+          score+=r.gained;
+        }
+      }else if(dir==='up'){
+        for(let j=0;j<4;j++){let col=[grid[0][j],grid[1][j],grid[2][j],grid[3][j]];const r=slide(col);for(let i=0;i<4;i++)grid[i][j]=r.row[i];score+=r.gained}
+      }else if(dir==='down'){
+        for(let j=0;j<4;j++){let col=[grid[3][j],grid[2][j],grid[1][j],grid[0][j]];const r=slide(col);for(let i=0;i<4;i++)grid[i][j]=r.row[3-i];score+=r.gained}
+      }
+      if(JSON.stringify(grid)!==old){
+        addRandom();draw();
+        if(!won&&grid.flat().includes(2048)){
+          won=true;
+          showWinOverlay(body.querySelector('.app-pad'));
+        }
+      }
+    }
+    const keyHandler=e=>{
+      const k=e.key.toLowerCase();
+      if(k==='arrowup'||k==='w'){move('up');e.preventDefault()}
+      else if(k==='arrowdown'||k==='s'){move('down');e.preventDefault()}
+      else if(k==='arrowleft'||k==='a'){move('left');e.preventDefault()}
+      else if(k==='arrowright'||k==='d'){move('right');e.preventDefault()}
+    };
+    document.addEventListener('keydown',keyHandler);
+    body.querySelector('#g2048Restart').onclick=reset;
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){document.removeEventListener('keydown',keyHandler);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:380,height:520});
+}
+
+/* ====== GAME: FLAPPY BIRD ====== */
+function renderFlappy(){
+  openWindow('flappy','Flappy Bird','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🐤 Flappy Puput</span><span class="pill" id="flappyScore">0</span></div>
+      <canvas id="flappyCanvas" class="game-canvas" width="320" height="400"></canvas>
+      <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-soft)">Klik / Spasi untuk terbang. Lewati 10 pipa untuk menang.</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="flappyRestart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const canvas=body.querySelector('#flappyCanvas');
+    const ctx=canvas.getContext('2d');
+    const scoreEl=body.querySelector('#flappyScore');
+    let bird,pipes,score,running,raf,won;
+    function reset(){
+      bird={x:60,y:200,vy:0};pipes=[];score=0;running=true;won=false;
+      scoreEl.textContent=score;
+      addPipe();
+      if(raf)cancelAnimationFrame(raf);
+      loop();
+    }
+    function addPipe(){pipes.push({x:320,gap:120+Math.random()*60,passed:false})}
+    function loop(){
+      if(!running)return;
+      ctx.fillStyle='#70c5ce';ctx.fillRect(0,0,320,400);
+      // ground
+      ctx.fillStyle='#ded895';ctx.fillRect(0,380,320,20);
+      // bird
+      bird.vy+=0.4;bird.y+=bird.vy;
+      ctx.fillStyle='#FFD93D';ctx.beginPath();ctx.arc(bird.x,bird.y,12,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#E63946';ctx.beginPath();ctx.arc(bird.x+4,bird.y-2,3,0,Math.PI*2);ctx.fill();
+      // pipes
+      pipes.forEach(p=>{
+        p.x-=2;
+        ctx.fillStyle='#06D6A0';
+        ctx.fillRect(p.x,0,40,p.gap-60);
+        ctx.fillRect(p.x,p.gap+60,40,400-p.gap-60);
+        if(!p.passed&&p.x+40<bird.x){p.passed=true;score++;scoreEl.textContent=score;
+          if(score>=10&&!won){won=true;running=false;showWinOverlay(body.querySelector('.app-pad'));return}}
+        if(bird.x+12>p.x&&bird.x-12<p.x+40&&(bird.y-12<p.gap-60||bird.y+12>p.gap+60))gameOver();
+      });
+      pipes=pipes.filter(p=>p.x>-40);
+      if(pipes.length===0||pipes[pipes.length-1].x<160)addPipe();
+      if(bird.y>380||bird.y<0)gameOver();
+      raf=requestAnimationFrame(loop);
+    }
+    function gameOver(){
+      running=false;cancelAnimationFrame(raf);
+      ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,320,400);
+      ctx.fillStyle='#fff';ctx.font='20px Space Grotesk';ctx.textAlign='center';
+      ctx.fillText('Game Over!',160,180);ctx.font='14px Space Grotesk';
+      ctx.fillText('Skor: '+score,160,210);
+      ctx.fillText('Klik Ulang untuk main lagi',160,235);
+    }
+    const flap=()=>{if(running)bird.vy=-7};
+    canvas.onclick=flap;
+    const keyHandler=e=>{if(e.code==='Space'){flap();e.preventDefault()}};
+    document.addEventListener('keydown',keyHandler);
+    body.querySelector('#flappyRestart').onclick=reset;
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){cancelAnimationFrame(raf);document.removeEventListener('keydown',keyHandler);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:380,height:520});
+}
+
+/* ====== GAME: TIC TAC TOE ====== */
+function renderTTT(){
+  openWindow('ttt','Tic Tac Toe','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>⭕ Lawan Ridho AI</span><span class="pill" id="tttStatus">Giliran kamu (X)</span></div>
+      <div class="ttt-grid" id="tttGrid"></div>
+      <div style="text-align:center;margin-top:10px"><button class="btn btn-soft" id="tttRestart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const gridEl=body.querySelector('#tttGrid');
+    const statusEl=body.querySelector('#tttStatus');
+    let board,running,playerTurn;
+    function reset(){
+      board=Array(9).fill(null);running=true;playerTurn=true;
+      statusEl.textContent='Giliran kamu (X)';draw();
+    }
+    function draw(){
+      gridEl.innerHTML='';
+      board.forEach((v,i)=>{
+        const c=document.createElement('div');
+        c.className='ttt-cell'+(v?(v==='X'?' x':' o'):'');
+        c.textContent=v||'';
+        c.onclick=()=>playerMove(i);
+        gridEl.appendChild(c);
+      });
+    }
+    function playerMove(i){
+      if(!running||!playerTurn||board[i])return;
+      board[i]='X';playerTurn=false;draw();
+      if(checkWin('X')){statusEl.textContent='Kamu menang!';running=false;showWinOverlay(body.querySelector('.app-pad'));return}
+      if(board.every(v=>v)){statusEl.textContent='Seri!';running=false;return}
+      statusEl.textContent='Ridho mikir...';
+      setTimeout(aiMove,500);
+    }
+    function aiMove(){
+      // simple AI: try win, block, center, corner, random
+      const move=findWinningMove('O')||findWinningMove('X')||(board[4]===null?4:findCorner())||findSide()||rand([...board.keys()].filter(i=>!board[i]));
+      if(move!==null&&move!==undefined){board[move]='O';draw();
+        if(checkWin('O')){statusEl.textContent='Ridho menang! Coba lagi ya';running=false;return}
+        if(board.every(v=>v)){statusEl.textContent='Seri!';running=false;return}
+        playerTurn=true;statusEl.textContent='Giliran kamu (X)';
+      }
+    }
+    function findWinningMove(p){
+      const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for(const l of lines){
+        const vals=l.map(i=>board[i]);
+        if(vals.filter(v=>v===p).length===2&&vals.includes(null))return l[vals.indexOf(null)];
+      }
+      return null;
+    }
+    function findCorner(){const c=[0,2,6,8];return c.find(i=>board[i]===null)||null}
+    function findSide(){const c=[1,3,5,7];return c.find(i=>board[i]===null)||null}
+    function checkWin(p){
+      const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      return lines.some(l=>l.every(i=>board[i]===p));
+    }
+    body.querySelector('#tttRestart').onclick=reset;
+    reset();
+  },{width:360,height:440});
+}
+
+/* ====== GAME: TEBAK EMOJI ====== */
+function renderEmoji(){
+  openWindow('emoji','Tebak Emoji','fa-solid fa-gamepad',(body)=>{
+    let score=0,round=0,correct=0;
+    const TOTAL=5;
+    function newRound(){
+      if(round>=TOTAL){showWinOverlay(body.querySelector('.app-pad'),`Selamat! Skor ${score}/${TOTAL}. Hadiahmu: peluk virtual dari Ridho 🤍`);return}
+      round++;
+      const q=rand(EMOJI_QUIZ);
+      const opts=[...q.opts].sort(()=>Math.random()-0.5);
+      body.innerHTML=`<div class="app-pad">
+        <div class="score-bar"><span>🤔 Tebak Emoji — Ronde ${round}/${TOTAL}</span><span class="pill" id="emojiScore">Benar: ${correct}</span></div>
+        <div class="emoji-q">${q.emoji}</div>
+        <div class="emoji-options" id="emojiOpts"></div>
+      </div>`;
+      const optsEl=body.querySelector('#emojiOpts');
+      opts.forEach(o=>{
+        const b=document.createElement('button');
+        b.className='btn btn-soft';b.textContent=o;b.style.justifyContent='center';
+        b.onclick=()=>{
+          if(o===q.ans){
+            correct++;score++;
+            b.style.background='var(--mint)';b.style.color='#fff';
+            spawnHearts(b.getBoundingClientRect().left+50,b.getBoundingClientRect().top);
+            toast("Benar! 🎉");
+          }else{
+            b.style.background='var(--accent)';b.style.color='#fff';
+            toast("Jawaban: "+q.ans);
+          }
+          optsEl.querySelectorAll('button').forEach(x=>x.disabled=true);
+          setTimeout(newRound,1200);
+        };
+        optsEl.appendChild(b);
+      });
+    }
+    newRound();
+  },{width:420,height:480});
+}
+
+/* ====== GAME: MEMORY CARD ====== */
+function renderMemory(){
+  openWindow('memory','Memory Card','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🃏 Memory Card</span><span class="pill" id="memMoves">0</span></div>
+      <div class="mem-grid" id="memGrid"></div>
+      <div style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-soft)">Cocokkan semua pasangan untuk menang.</div>
+    </div>`;
+    const grid=body.querySelector('#memGrid');
+    const movesEl=body.querySelector('#memMoves');
+    const emojis=['💗','🌸','🦫','🌙','⭐','🍫','🍯','🍓'];
+    let cards=[],flipped=[],matched,moves,won;
+    function reset(){
+      cards=[...emojis,...emojis].sort(()=>Math.random()-0.5);
+      flipped=[];matched=0;moves=0;won=false;movesEl.textContent=moves;
+      grid.innerHTML='';
+      cards.forEach((e,i)=>{
+        const c=document.createElement('div');
+        c.className='mem-card';c.dataset.i=i;c.dataset.e=e;
+        c.innerHTML=`<div class="mem-inner">
+          <div class="mem-face mem-front"><i class="fa-solid fa-heart"></i></div>
+          <div class="mem-face mem-back">${e}</div></div>`;
+        c.onclick=()=>flip(c);
+        grid.appendChild(c);
+      });
+    }
+    function flip(c){
+      if(won)return;
+      if(c.classList.contains('flipped')||c.classList.contains('matched'))return;
+      if(flipped.length===2)return;
+      c.classList.add('flipped');flipped.push(c);
+      if(flipped.length===2){
+        moves++;movesEl.textContent=moves;
+        const [a,b]=flipped;
+        if(a.dataset.e===b.dataset.e){
+          a.classList.add('matched');b.classList.add('matched');
+          matched++;flipped=[];
+          if(matched===emojis.length){
+            won=true;
+            setTimeout(()=>showWinOverlay(body.querySelector('.app-pad')),400);
+          }
+        }else{
+          setTimeout(()=>{
+            a.classList.remove('flipped');b.classList.remove('flipped');flipped=[]
+          },800);
+        }
+      }
+    }
+    reset();
+  },{width:400,height:520});
+}
+
+/* ====== GAME: BREAKOUT ====== */
+function renderBreakout(){
+  openWindow('breakout','Breakout','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🧱 Breakout</span><span class="pill" id="brkScore">0</span></div>
+      <canvas id="brkCanvas" class="game-canvas" width="320" height="400"></canvas>
+      <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-soft)">Panah / A-D gerak paddle. Hancurkan semua balok!</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="brkRestart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const canvas=body.querySelector('#brkCanvas');
+    const ctx=canvas.getContext('2d');
+    const scoreEl=body.querySelector('#brkScore');
+    let paddle,ball,bricks,score,running,raf,won,keys;
+    function reset(){
+      paddle={x:120,w:80};ball={x:160,y:350,vx:3,vy:-3,r:7};
+      bricks=[];score=0;running=true;won=false;keys={};
+      const colors=['#E63946','#FFB627','#06D6A0','#9B5DE5','#118AB2'];
+      for(let r=0;r<5;r++)for(let c=0;c<8;c++)bricks.push({x:c*40,y:30+r*22,w:36,h:18,alive:true,color:colors[r]});
+      scoreEl.textContent=score;
+      if(raf)cancelAnimationFrame(raf);
+      loop();
+    }
+    function loop(){
+      if(!running)return;
+      ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,320,400);
+      if(keys.left)paddle.x=Math.max(0,paddle.x-6);
+      if(keys.right)paddle.x=Math.min(320-paddle.w,paddle.x+6);
+      ball.x+=ball.vx;ball.y+=ball.vy;
+      if(ball.x-ball.r<0||ball.x+ball.r>320)ball.vx*=-1;
+      if(ball.y-ball.r<0)ball.vy*=-1;
+      if(ball.y+ball.r>380){
+        if(ball.x>paddle.x&&ball.x<paddle.x+paddle.w){ball.vy=-Math.abs(ball.vy);ball.vx+=(ball.x-(paddle.x+paddle.w/2))*0.08}
+        else{gameOver();return}
+      }
+      bricks.forEach(b=>{
+        if(!b.alive)return;
+        if(ball.x+ball.r>b.x&&ball.x-ball.r<b.x+b.w&&ball.y+ball.r>b.y&&ball.y-ball.r<b.y+b.h){
+          b.alive=false;ball.vy*=-1;score+=10;scoreEl.textContent=score;
+        }
+      });
+      if(bricks.every(b=>!b.alive)&&!won){won=true;running=false;showWinOverlay(body.querySelector('.app-pad'));return}
+      bricks.forEach(b=>{if(b.alive){ctx.fillStyle=b.color;ctx.fillRect(b.x,b.y,b.w,b.h)}});
+      ctx.fillStyle='#FF8FA3';ctx.fillRect(paddle.x,372,paddle.w,8);
+      ctx.fillStyle='#FFD93D';ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
+      raf=requestAnimationFrame(loop);
+    }
+    function gameOver(){
+      running=false;cancelAnimationFrame(raf);
+      ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,0,320,400);
+      ctx.fillStyle='#fff';ctx.font='20px Space Grotesk';ctx.textAlign='center';
+      ctx.fillText('Game Over!',160,180);ctx.font='14px Space Grotesk';ctx.fillText('Skor: '+score,160,210);
+    }
+    const keyDown=e=>{const k=e.key.toLowerCase();if(k==='arrowleft'||k==='a')keys.left=true;if(k==='arrowright'||k==='d')keys.right=true;e.preventDefault()};
+    const keyUp=e=>{const k=e.key.toLowerCase();if(k==='arrowleft'||k==='a')keys.left=false;if(k==='arrowright'||k==='d')keys.right=false};
+    document.addEventListener('keydown',keyDown);document.addEventListener('keyup',keyUp);
+    body.querySelector('#brkRestart').onclick=reset;
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){cancelAnimationFrame(raf);document.removeEventListener('keydown',keyDown);document.removeEventListener('keyup',keyUp);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:380,height:520});
+}
+
+/* ====== GAME: SIMON SAYS ====== */
+function renderSimon(){
+  openWindow('simon','Simon Says','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🎨 Simon Says</span><span class="pill" id="simonLevel">Level 1</span></div>
+      <div class="simon-grid" id="simonGrid">
+        <button class="simon-btn s-red" data-i="0"></button><button class="simon-btn s-blue" data-i="1"></button>
+        <button class="simon-btn s-green" data-i="2"></button><button class="simon-btn s-yellow" data-i="3"></button>
+      </div>
+      <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-soft)" id="simonStatus">Perhatikan urutannya...</div>
+      <div style="text-align:center;margin-top:10px"><button class="btn btn-soft" id="simonStart"><i class="fa-solid fa-play"></i> Mulai</button></div>
+    </div>`;
+    const btns=[...body.querySelectorAll('.simon-btn')];
+    const levelEl=body.querySelector('#simonLevel');
+    const statusEl=body.querySelector('#simonStatus');
+    let seq=[],step,playing,canInput;
+    function flash(i,dur=400){
+      return new Promise(r=>{btns[i].classList.add('lit');setTimeout(()=>{btns[i].classList.remove('lit');setTimeout(r,dur*0.3)},dur*0.7)});
+    }
+    async function playSeq(){
+      canInput=false;statusEl.textContent='Perhatikan...';
+      for(const i of seq){await flash(i)}
+      canInput=true;step=0;statusEl.textContent='Giliran kamu!';
+    }
+    async function startRound(){
+      seq.push(Math.floor(Math.random()*4));
+      levelEl.textContent='Level '+seq.length;
+      await sleep(400);await playSeq();
+    }
+    btns.forEach(b=>b.onclick=async()=>{
+      if(!playing||!canInput)return;
+      const i=+b.dataset.i;
+      await flash(i,200);
+      if(i!==seq[step]){statusEl.textContent='Salah! Coba lagi.';playing=false;canInput=false;return}
+      step++;
+      if(step===seq.length){
+        if(seq.length>=8){showWinOverlay(body.querySelector('.app-pad'),'Level 8 tercapai! Refleks kamu luar biasa 🤍');playing=false;return}
+        statusEl.textContent='Benar! Level berikutnya...';
+        canInput=false;setTimeout(startRound,800);
+      }
+    });
+    body.querySelector('#simonStart').onclick=()=>{seq=[];playing=true;startRound()};
+  },{width:360,height:480});
+}
+
+/* ====== GAME: WHACK-A-MOLE ====== */
+function renderWhack(){
+  openWindow('whack','Whack-a-Mole','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🔨 Whack-a-Mole</span><span class="pill" id="whackScore">0</span></div>
+      <div class="whack-grid" id="whackGrid"></div>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text-soft)" id="whackTimer">30 detik — pukul capybara 🦫!</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="whackStart"><i class="fa-solid fa-play"></i> Mulai</button></div>
+    </div>`;
+    const grid=body.querySelector('#whackGrid');
+    const scoreEl=body.querySelector('#whackScore');
+    const timerEl=body.querySelector('#whackTimer');
+    const holes=[];
+    for(let i=0;i<9;i++){
+      const h=document.createElement('div');h.className='whack-hole';h.textContent='';grid.appendChild(h);holes.push(h);
+    }
+    let score,moleIdx,timer,timeLeft,running,spawnInt;
+    function reset(){
+      score=0;timeLeft=30;running=false;moleIdx=-1;
+      scoreEl.textContent=score;timerEl.textContent='30 detik — pukul capybara 🦫!';
+      holes.forEach(h=>h.textContent='');
+      clearInterval(timer);clearInterval(spawnInt);
+    }
+    function spawnMole(){
+      if(!running)return;
+      holes.forEach(h=>h.textContent='');
+      moleIdx=Math.floor(Math.random()*9);
+      holes[moleIdx].textContent='🦫';
+    }
+    function start(){
+      reset();running=true;
+      spawnMole();
+      spawnInt=setInterval(spawnMole,900);
+      timer=setInterval(()=>{
+        timeLeft--;timerEl.textContent=timeLeft+' detik tersisa';
+        if(timeLeft<=0){
+          running=false;clearInterval(timer);clearInterval(spawnInt);
+          holes.forEach(h=>h.textContent='');
+          if(score>=15)showWinOverlay(body.querySelector('.app-pad'),`Skor ${score}! Capybara ketakutan 🤍`);
+          else timerEl.textContent=`Waktu habis! Skor: ${score}. Target: 15`;
+        }
+      },1000);
+    }
+    holes.forEach((h,i)=>h.onclick=()=>{
+      if(!running||i!==moleIdx||!h.textContent)return;
+      score++;scoreEl.textContent=score;h.textContent='💥';
+      spawnHearts(h.getBoundingClientRect().left+20,h.getBoundingClientRect().top);
+      moleIdx=-1;
+    });
+    body.querySelector('#whackStart').onclick=start;
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){clearInterval(timer);clearInterval(spawnInt);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+  },{width:400,height:520});
+}
+
+/* ====== GAME: PONG ====== */
+function renderPong(){
+  openWindow('pong','Pong','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🏓 Pong vs Ridho</span><span class="pill" id="pongScore">0 - 0</span></div>
+      <canvas id="pongCanvas" class="game-canvas" width="320" height="400"></canvas>
+      <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-soft)">W/S atau panah atas-bawah. Menang di 5 poin.</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="pongRestart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const canvas=body.querySelector('#pongCanvas');
+    const ctx=canvas.getContext('2d');
+    const scoreEl=body.querySelector('#pongScore');
+    let pPaddle,aPaddle,ball,ps,as,running,raf,keys,won;
+    function reset(){
+      pPaddle={y:160,h:70};aPaddle={y:160,h:70};
+      ball={x:160,y:200,vx:4*(Math.random()>.5?1:-1),vy:3*(Math.random()>.5?1:-1),r:8};
+      ps=0;as=0;running=true;won=false;keys={};
+      scoreEl.textContent='0 - 0';
+      if(raf)cancelAnimationFrame(raf);
+      loop();
+    }
+    function loop(){
+      if(!running)return;
+      ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,320,400);
+      ctx.setLineDash([4,8]);ctx.strokeStyle='rgba(255,255,255,.2)';ctx.beginPath();ctx.moveTo(160,0);ctx.lineTo(160,400);ctx.stroke();ctx.setLineDash([]);
+      if(keys.up)pPaddle.y=Math.max(0,pPaddle.y-5);
+      if(keys.down)pPaddle.y=Math.min(400-pPaddle.h,pPaddle.y+5);
+      const target=aPaddle.y+aPaddle.h/2;
+      if(ball.y<target-10)aPaddle.y=Math.max(0,aPaddle.y-4);
+      else if(ball.y>target+10)aPaddle.y=Math.min(400-aPaddle.h,aPaddle.y+4);
+      ball.x+=ball.vx;ball.y+=ball.vy;
+      if(ball.y-ball.r<0||ball.y+ball.r>400)ball.vy*=-1;
+      if(ball.x-ball.r<14&&ball.y>pPaddle.y&&ball.y<pPaddle.y+pPaddle.h){ball.vx=Math.abs(ball.vx);ball.vy+=(ball.y-(pPaddle.y+pPaddle.h/2))*0.15}
+      if(ball.x+ball.r>306&&ball.y>aPaddle.y&&ball.y<aPaddle.y+aPaddle.h){ball.vx=-Math.abs(ball.vx);ball.vy+=(ball.y-(aPaddle.y+aPaddle.h/2))*0.15}
+      if(ball.x<0){as++;scoreEl.textContent=ps+' - '+as;serve(1);if(as>=5){running=false;toast('Ridho menang! Coba lagi');return}}
+      if(ball.x>320){ps++;scoreEl.textContent=ps+' - '+as;serve(-1);if(ps>=5&&!won){won=true;running=false;showWinOverlay(body.querySelector('.app-pad'));return}}
+      ctx.fillStyle='#06D6A0';ctx.fillRect(4,pPaddle.y,10,pPaddle.h);
+      ctx.fillStyle='#E63946';ctx.fillRect(306,aPaddle.y,10,aPaddle.h);
+      ctx.fillStyle='#FFD93D';ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();
+      raf=requestAnimationFrame(loop);
+    }
+    function serve(dir){ball={x:160,y:200,vx:4*dir,vy:3*(Math.random()>.5?1:-1),r:8}}
+    const keyDown=e=>{const k=e.key.toLowerCase();if(k==='arrowup'||k==='w')keys.up=true;if(k==='arrowdown'||k==='s')keys.down=true};
+    const keyUp=e=>{const k=e.key.toLowerCase();if(k==='arrowup'||k==='w')keys.up=false;if(k==='arrowdown'||k==='s')keys.down=false};
+    document.addEventListener('keydown',keyDown);document.addEventListener('keyup',keyUp);
+    body.querySelector('#pongRestart').onclick=reset;
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){cancelAnimationFrame(raf);document.removeEventListener('keydown',keyDown);document.removeEventListener('keyup',keyUp);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:380,height:520});
+}
+
+/* ====== GAME: CONNECT FOUR ====== */
+function renderConnect4(){
+  openWindow('connect4','Connect Four','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>🔴 Connect Four</span><span class="pill" id="c4Status">Giliran kamu (🔴)</span></div>
+      <div class="c4-board" id="c4Board"></div>
+      <div style="text-align:center;margin-top:10px"><button class="btn btn-soft" id="c4Restart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const boardEl=body.querySelector('#c4Board');
+    const statusEl=body.querySelector('#c4Status');
+    const ROWS=6,COLS=7;
+    let board,running,playerTurn;
+    function reset(){
+      board=Array(ROWS).fill(0).map(()=>Array(COLS).fill(0));
+      running=true;playerTurn=true;statusEl.textContent='Giliran kamu (🔴)';draw();
+    }
+    function draw(){
+      boardEl.innerHTML='';
+      for(let c=0;c<COLS;c++){
+        const col=document.createElement('div');
+        col.style.display='flex';col.style.flexDirection='column-reverse';col.style.gap='5px';
+        for(let r=0;r<ROWS;r++){
+          const cell=document.createElement('div');
+          cell.className='c4-cell'+(board[r][c]===1?' red':board[r][c]===2?' yellow':'');
+          cell.onclick=()=>drop(c);
+          col.appendChild(cell);
+        }
+        boardEl.appendChild(col);
+      }
+    }
+    function drop(col){
+      if(!running||!playerTurn)return;
+      for(let r=ROWS-1;r>=0;r--){
+        if(board[r][col]===0){
+          board[r][col]=1;draw();
+          if(checkWin(1)){statusEl.textContent='Kamu menang!';running=false;showWinOverlay(body.querySelector('.app-pad'));return}
+          if(full()){statusEl.textContent='Seri!';running=false;return}
+          playerTurn=false;statusEl.textContent='Ridho mikir...';
+          setTimeout(aiDrop,600);
+          return;
+        }
+      }
+    }
+    function aiDrop(){
+      const move=findBestMove();
+      if(move===null){statusEl.textContent='Seri!';running=false;return}
+      for(let r=ROWS-1;r>=0;r--){
+        if(board[r][move]===0){board[r][move]=2;break}
+      }
+      draw();
+      if(checkWin(2)){statusEl.textContent='Ridho menang!';running=false;return}
+      if(full()){statusEl.textContent='Seri!';running=false;return}
+      playerTurn=true;statusEl.textContent='Giliran kamu (🔴)';
+    }
+    function findBestMove(){
+      for(let c=0;c<COLS;c++){
+        if(board[0][c]!==0)continue;
+        for(let r=ROWS-1;r>=0;r--)if(board[r][c]===0){
+          board[r][c]=2;if(checkWin(2)){board[r][c]=0;return c}
+          board[r][c]=0;
+        }
+      }
+      for(let c=0;c<COLS;c++){
+        if(board[0][c]!==0)continue;
+        for(let r=ROWS-1;r>=0;r--)if(board[r][c]===0){
+          board[r][c]=1;if(checkWin(1)){board[r][c]=0;return c}
+          board[r][c]=0;
+        }
+      }
+      const pref=[3,2,4,1,5,0,6];
+      return pref.find(c=>board[0][c]===0)??null;
+    }
+    function checkWin(p){
+      for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+        if(c<=COLS-4&&board[r][c]===p&&board[r][c+1]===p&&board[r][c+2]===p&&board[r][c+3]===p)return true;
+        if(r<=ROWS-4&&board[r][c]===p&&board[r+1][c]===p&&board[r+2][c]===p&&board[r+3][c]===p)return true;
+        if(r<=ROWS-4&&c<=COLS-4&&board[r][c]===p&&board[r+1][c+1]===p&&board[r+2][c+2]===p&&board[r+3][c+3]===p)return true;
+        if(r>=3&&c<=COLS-4&&board[r][c]===p&&board[r-1][c+1]===p&&board[r-2][c+2]===p&&board[r-3][c+3]===p)return true;
+      }
+      return false;
+    }
+    function full(){return board[0].every(v=>v!==0)}
+    body.querySelector('#c4Restart').onclick=reset;
+    reset();
+  },{width:400,height:480});
+}
+
+/* ====== GAME: REACTION ====== */
+function renderReaction(){
+  openWindow('reaction','Reaction Test','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>⚡ Reaction</span><span class="pill" id="reactRound">0/5</span></div>
+      <div class="react-box wait" id="reactBox">Klik Mulai</div>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text-soft)" id="reactInfo">Klik saat kotak hijau. Terlalu cepat = gagal!</div>
+      <div style="text-align:center;margin-top:8px;font-size:14px;font-weight:600" id="reactAvg"></div>
+    </div>`;
+    const box=body.querySelector('#reactBox');
+    const roundEl=body.querySelector('#reactRound');
+    const infoEl=body.querySelector('#reactInfo');
+    const avgEl=body.querySelector('#reactAvg');
+    let round,times,state,startTime,timeoutId;
+    function reset(){
+      round=0;times=[];state='idle';
+      roundEl.textContent='0/5';avgEl.textContent='';
+      box.className='react-box wait';box.textContent='Klik Mulai';
+      infoEl.textContent='Klik saat kotak hijau. Terlalu cepat = gagal!';
+    }
+    function nextRound(){
+      round++;roundEl.textContent=round+'/5';
+      state='wait';box.className='react-box wait';box.textContent='Tunggu...';
+      clearTimeout(timeoutId);
+      timeoutId=setTimeout(()=>{
+        state='go';startTime=Date.now();
+        box.className='react-box go';box.textContent='KLIK!';
+      },1500+Math.random()*2500);
+    }
+    box.onclick=()=>{
+      if(state==='idle'){reset();nextRound();return}
+      if(state==='wait'){state='idle';clearTimeout(timeoutId);box.className='react-box wait';box.textContent='Terlalu cepat!';infoEl.textContent='Tunggu hijau dulu ya 😄';setTimeout(()=>{box.textContent='Klik Mulai';infoEl.textContent='Klik saat kotak hijau. Terlalu cepat = gagal!'},1200);return}
+      if(state==='go'){
+        const ms=Date.now()-startTime;times.push(ms);
+        state='idle';box.className='react-box ready';box.textContent=ms+' ms';
+        infoEl.textContent='Bagus! '+ms+' ms';
+        if(round>=5){
+          const avg=Math.round(times.reduce((a,b)=>a+b,0)/times.length);
+          avgEl.textContent='Rata-rata: '+avg+' ms';
+          if(avg<=350)showWinOverlay(body.querySelector('.app-pad'),`Refleks ${avg} ms! Super cepat 🤍`);
+          else infoEl.textContent='Rata-rata '+avg+' ms. Target ≤350 ms. Coba lagi!';
+          box.textContent='Selesai';
+        }else setTimeout(nextRound,1000);
+      }
+    };
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){clearTimeout(timeoutId);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:400,height:420});
+}
+
+/* ====== GAME: ROCK PAPER SCISSORS ====== */
+function renderRPS(){
+  openWindow('rps','Batu Gunting Kertas','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>✊ vs Ridho</span><span class="pill" id="rpsScore">0 - 0</span></div>
+      <div class="rps-result" id="rpsResult">Pilih gerakanmu!</div>
+      <div class="rps-btns">
+        <button class="rps-btn" data-p="rock" title="Batu">✊</button>
+        <button class="rps-btn" data-p="paper" title="Kertas">✋</button>
+        <button class="rps-btn" data-p="scissors" title="Gunting">✌️</button>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--text-soft)">Menang 3 ronde dulu. Ridho suka curang sedikit 😄</div>
+    </div>`;
+    const scoreEl=body.querySelector('#rpsScore');
+    const resultEl=body.querySelector('#rpsResult');
+    let ps=0,as=0;
+    const names={rock:'Batu',paper:'Kertas',scissors:'Gunting'};
+    const beats={rock:'scissors',paper:'rock',scissors:'paper'};
+    const btns=body.querySelectorAll('.rps-btn');
+    btns.forEach(b=>b.onclick=()=>{
+      const player=b.dataset.p;
+      const ai=rand(['rock','paper','scissors']);
+      resultEl.textContent=`Kamu: ${names[player]} vs Ridho: ${names[ai]}`;
+      if(player===ai)resultEl.textContent+=' — Seri!';
+      else if(beats[player]===ai){ps++;resultEl.textContent+=' — Kamu menang!'}
+      else{as++;resultEl.textContent+=' — Ridho menang!'}
+      scoreEl.textContent=ps+' - '+as;
+      if(ps>=3)showWinOverlay(body.querySelector('.app-pad'),'3 kemenangan! Ridho ngaku kalah 🤍');
+      else if(as>=3){resultEl.textContent='Ridho menang 3-'+ps+'! Coba lagi ya';ps=0;as=0;scoreEl.textContent='0 - 0'}
+    });
+  },{width:400,height:420});
+}
+
+/* ====== GAME: CATCH HEARTS ====== */
+function renderCatch(){
+  openWindow('catch','Catch Hearts','fa-solid fa-gamepad',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="score-bar"><span>💗 Catch Hearts</span><span class="pill" id="catchScore">0</span></div>
+      <canvas id="catchCanvas" class="game-canvas" width="320" height="400"></canvas>
+      <div style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-soft)">Panah / A-D gerak. Tangkap 20 hati!</div>
+      <div style="text-align:center;margin-top:8px"><button class="btn btn-soft" id="catchRestart"><i class="fa-solid fa-rotate"></i> Ulang</button></div>
+    </div>`;
+    const canvas=body.querySelector('#catchCanvas');
+    const ctx=canvas.getContext('2d');
+    const scoreEl=body.querySelector('#catchScore');
+    let basket,hearts,score,running,raf,keys,won,spawnT;
+    function reset(){
+      basket={x:130,w:60};hearts=[];score=0;running=true;won=false;keys={};
+      scoreEl.textContent=score;
+      if(raf)cancelAnimationFrame(raf);
+      clearInterval(spawnT);
+      spawnT=setInterval(()=>{if(running)hearts.push({x:Math.random()*280+10,y:-20,vy:2+Math.random()*2,emoji:rand(['💗','💖','💕','🤍','💘'])})},700);
+      loop();
+    }
+    function loop(){
+      if(!running)return;
+      ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,320,400);
+      if(keys.left)basket.x=Math.max(0,basket.x-6);
+      if(keys.right)basket.x=Math.min(320-basket.w,basket.x+6);
+      hearts.forEach(h=>{h.y+=h.vy});
+      hearts=hearts.filter(h=>{
+        if(h.y>360&&h.y<380&&h.x+10>basket.x&&h.x<basket.x+basket.w){
+          score++;scoreEl.textContent=score;spawnHearts(h.x,h.y);
+          if(score>=20&&!won){won=true;running=false;clearInterval(spawnT);showWinOverlay(body.querySelector('.app-pad'));return false}
+          return false;
+        }
+        return h.y<420;
+      });
+      ctx.font='22px serif';hearts.forEach(h=>ctx.fillText(h.emoji,h.x,h.y));
+      ctx.fillStyle='#FF8FA3';ctx.fillRect(basket.x,372,basket.w,10);
+      ctx.fillStyle='rgba(255,255,255,.3)';ctx.fillRect(basket.x+4,376,basket.w-8,4);
+      raf=requestAnimationFrame(loop);
+    }
+    const keyDown=e=>{const k=e.key.toLowerCase();if(k==='arrowleft'||k==='a')keys.left=true;if(k==='arrowright'||k==='d')keys.right=true};
+    const keyUp=e=>{const k=e.key.toLowerCase();if(k==='arrowleft'||k==='a')keys.left=false;if(k==='arrowright'||k==='d')keys.right=false};
+    document.addEventListener('keydown',keyDown);document.addEventListener('keyup',keyUp);
+    body.querySelector('#catchRestart').onclick=reset;
+    const observer=new MutationObserver(()=>{if(!document.body.contains(body)){cancelAnimationFrame(raf);clearInterval(spawnT);document.removeEventListener('keydown',keyDown);document.removeEventListener('keyup',keyUp);observer.disconnect()}});
+    observer.observe(document.body,{childList:true,subtree:true});
+    reset();
+  },{width:380,height:520});
+}
+
+/* ====== GAME: WORD SCRAMBLE ====== */
+function renderScramble(){
+  openWindow('scramble','Word Scramble','fa-solid fa-gamepad',(body)=>{
+    let round=0,correct=0;
+    function scrambleWord(w){
+      const a=w.split('');
+      for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+      return a.join('')===w?scrambleWord(w):a.join('');
+    }
+    function newRound(){
+      if(round>=5){showWinOverlay(body.querySelector('.app-pad'),`${correct}/5 benar! Vocabulary Puput OS unlocked 🤍`);return}
+      round++;
+      const q=rand(SCRAMBLE_WORDS);
+      const scrambled=scrambleWord(q.word);
+      body.innerHTML=`<div class="app-pad">
+        <div class="score-bar"><span>🔤 Word Scramble — ${round}/5</span><span class="pill">Benar: ${correct}</span></div>
+        <div class="scramble-word">${scrambled}</div>
+        <p style="text-align:center;font-size:13px;color:var(--text-soft);margin-bottom:14px">Hint: ${q.hint}</p>
+        <input class="scramble-input" id="scrInput" placeholder="Ketik jawaban..." autocomplete="off">
+        <div style="text-align:center;margin-top:12px"><button class="btn btn-primary" id="scrSubmit">Jawab</button></div>
+      </div>`;
+      const input=body.querySelector('#scrInput');
+      const submit=()=>{
+        if(input.value.trim().toUpperCase()===q.word.toUpperCase()){
+          correct++;toast('Benar! 🎉');spawnHearts(window.innerWidth/2,window.innerHeight/2);
+        }else toast('Jawaban: '+q.word);
+        setTimeout(newRound,1000);
+      };
+      body.querySelector('#scrSubmit').onclick=submit;
+      input.onkeydown=e=>{if(e.key==='Enter')submit()};
+      input.focus();
+    }
+    newRound();
+  },{width:420,height:420});
+}
+
+/* ====== DAILY SURPRISE ====== */
+function getDailyState(){
+  const today=new Date().toDateString();
+  const saved=localStorage.getItem('puput_daily');
+  if(saved){
+    try{
+      const obj=JSON.parse(saved);
+      if(obj.lastOpen!==today){
+        // new day, reset openedDays if cycle done
+        if(obj.openedDays&&obj.openedDays.length>=7){
+          obj.openedDays=[];obj.lastOpen=null;
+        }
+        return obj;
+      }
+      return obj;
+    }catch(e){}
+  }
+  return{lastOpen:null,openedDays:[]};
+}
+function saveDailyState(s){localStorage.setItem('puput_daily',JSON.stringify(s))}
+
+function openDaily(){
+  openWindow('daily','Daily Surprise','fa-solid fa-gift',(body)=>{
+    const st=getDailyState();
+    const today=new Date().toDateString();
+    const todayOpened=st.lastOpen===today;
+    const nextDay=st.openedDays.length+1;
+    body.innerHTML=`<div class="app-pad">
+      <div class="app-h">🌸 Daily Surprise</div>
+      <div class="app-sub">Setiap hari cuma bisa buka 1 hadiah. Kembali besok untuk yang baru!</div>
+      <div class="daily-grid" id="dailyGrid"></div>
+      <div style="text-align:center;margin-top:14px;padding:12px;background:var(--glass);border-radius:10px;font-size:13px" id="dailyInfo">
+        ${todayOpened?'Kamu sudah buka hadiah hari ini. Kembali besok ya 🤍':`Hari ini kamu bisa buka hadiah hari ke-${nextDay}.`}
+      </div>
+    </div>`;
+    const grid=body.querySelector('#dailyGrid');
+    DAILY_SURPRISES.forEach(d=>{
+      const opened=st.openedDays.includes(d.day);
+      const isToday=d.day===nextDay&&!todayOpened;
+      const locked=d.day>nextDay;
+      const c=document.createElement('div');
+      c.className='daily-card'+(opened?' unlocked':'')+(locked?' locked':'')+(isToday?' today':'');
+      c.innerHTML=`<div class="day">Hari ${d.day}</div><div class="ico">${opened?d.icon:(locked?'🔒':'🎁')}</div><div class="label">${d.label}</div>`;
+      c.onclick=()=>{
+        if(opened){showDailyContent(d,true);return}
+        if(locked){toast("Belum saatnya. Besok ya!");return}
+        // open today's
+        st.openedDays.push(d.day);st.lastOpen=today;saveDailyState(st);
+        showDailyContent(d,false);
+        setTimeout(()=>{closeWindow('daily');setTimeout(openDaily,300)},100);
+      };
+      grid.appendChild(c);
+    });
+  },{width:560,height:480});
+}
+function showDailyContent(d,isReopen){
+  openWindow('dailyContent'+d.day+Date.now(),`Hadiah Hari ${d.day}`,'fa-solid fa-gift',(body)=>{
+    body.innerHTML=`<div class="app-pad" style="text-align:center">
+      <div style="font-size:60px;margin:10px 0">${d.icon}</div>
+      <h3 style="font-family:'Caprasimo';color:var(--accent);margin-bottom:14px">Hari ${d.day}: ${d.label}</h3>
+      <div id="dailyContentArea" style="min-height:120px"></div>
+      <p style="font-family:'Caveat';font-size:18px;margin-top:14px;color:var(--text-soft)">— Ridho 🤍</p>
+    </div>`;
+    const area=body.querySelector('#dailyContentArea');
+    if(d.type==='text'){
+      area.innerHTML=`<p style="font-family:'Caveat';font-size:24px;line-height:1.5">${d.content()}</p>`;
+    }else if(d.type==='image'){
+      area.innerHTML=`<img src="${d.content()}" style="max-width:100%;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15)"><p style="font-family:'Caveat';font-size:20px;margin-top:10px">Foto ini aku pilih khusus buat kamu hari ini.</p>`;
+    }else if(d.type==='voice'){
+      area.innerHTML=`<p style="font-family:'Caveat';font-size:22px;margin-bottom:14px">"${d.content()}"</p>
+      <button class="btn btn-primary" id="playVoice"><i class="fa-solid fa-volume-high"></i> Putar Voice Note</button>`;
+      body.querySelector('#playVoice').onclick=()=>{
+        if('speechSynthesis'in window){
+          const u=new SpeechSynthesisUtterance(d.content());
+          u.lang='id-ID';u.rate=0.9;u.pitch=1.1;
+          speechSynthesis.speak(u);
+          toast("Memutar voice note...");
+        }else toast("Browser gak support voice 😢");
+      };
+    }else if(d.type==='story'){
+      area.innerHTML=`<p style="font-family:'Caveat';font-size:20px;line-height:1.6;text-align:left">${d.content()}</p>`;
+    }else if(d.type==='lyrics'){
+      area.innerHTML=`<p style="font-family:'Caveat';font-size:22px;line-height:1.6;white-space:pre-line">${d.content()}</p>`;
+    }else if(d.type==='video'){
+      area.innerHTML=`<div style="background:linear-gradient(135deg,#FFB4A2,#FFD6E0);border-radius:10px;padding:30px 20px;margin:10px 0">
+        <div style="font-size:60px;animation:petBob 3s infinite">🤍</div>
+        <p style="font-family:'Caveat';font-size:22px;margin-top:10px">"Puput, ini aku. Maaf videonya cuma teks. Tapi yang penting: aku sayang kamu. Selalu."</p>
+      </div>
+      <p style="font-size:12px;color:var(--text-soft)">[ Video pendek — mode hemat data aktif 😄 ]</p>`;
+    }
+  },{width:440,height:480});
+}
+
+/* ====== WHEEL OF LOVE ====== */
+function openWheel(){
+  openWindow('wheel','Wheel of Love','fa-solid fa-circle-notch',(body)=>{
+    const segments=[
+      {label:"Gombalan",color:"#E63946",action:()=>rand(GOMBAL)},
+      {label:"Challenge",color:"#FFB627",action:()=>"Challenge: Kirim foto selfie ke Ridho sekarang! 📸"},
+      {label:"Hadiah",color:"#06D6A0",action:()=>"Hadiahmu: peluk virtual dari Ridho 🤍"},
+      {label:"Lagu",color:"#9B5DE5",action:()=>rand(SONG_LYRICS)},
+      {label:"Quotes",color:"#118AB2",action:()=>rand(QUOTES)},
+      {label:"Pesan",color:"#F15BB5",action:()=>rand(MESSAGES)},
+      {label:"Ciuman",color:"#FF8FA3",action:()=>"😘 Mwah! Cium virtual dari Ridho."},
+      {label:"Cerita",color:"#FFD700",action:()=>rand(STORIES)}
+    ];
+    body.innerHTML=`<div class="wheel-stage">
+      <div class="app-h">🎲 Wheel of Love</div>
+      <div class="app-sub">Putar roda, lihat apa hadiahmu hari ini.</div>
+      <div class="wheel-pointer">🔻</div>
+      <div class="wheel" id="wheelEl"></div>
+      <button class="btn btn-primary" id="wheelSpin" style="margin-top:18px"><i class="fa-solid fa-rotate"></i> Putar</button>
+      <div class="wheel-result" id="wheelResult">Putar dulu ya!</div>
+    </div>`;
+    const wheelEl=body.querySelector('#wheelEl');
+    const seg=360/segments.length;
+    let svg=`<svg viewBox="0 0 200 200">`;
+    segments.forEach((s,i)=>{
+      const a1=i*seg-90,a2=(i+1)*seg-90;
+      const x1=100+100*Math.cos(a1*Math.PI/180),y1=100+100*Math.sin(a1*Math.PI/180);
+      const x2=100+100*Math.cos(a2*Math.PI/180),y2=100+100*Math.sin(a2*Math.PI/180);
+      const large=seg>180?1:0;
+      svg+=`<path d="M100,100 L${x1},${y1} A100,100 0 ${large} 1 ${x2},${y2} Z" fill="${s.color}" stroke="#fff" stroke-width="1"/>`;
+      const ta=i*seg+seg/2-90;
+      const tx=100+60*Math.cos(ta*Math.PI/180),ty=100+60*Math.sin(ta*Math.PI/180);
+      svg+=`<text x="${tx}" y="${ty}" fill="#fff" font-size="9" font-weight="700" text-anchor="middle" transform="rotate(${i*seg+seg/2} ${tx} ${ty})">${s.label}</text>`;
+    });
+    svg+=`<circle cx="100" cy="100" r="12" fill="#fff"/><circle cx="100" cy="100" r="6" fill="#E63946"/></svg>`;
+    wheelEl.innerHTML=svg;
+    let spinning=false;let rotation=0;
+    body.querySelector('#wheelSpin').onclick=()=>{
+      if(spinning)return;
+      spinning=true;
+      const target=Math.floor(Math.random()*segments.length);
+      const extra=360*5+target*seg+seg/2;
+      rotation+=extra;
+      wheelEl.style.transform=`rotate(${rotation}deg)`;
+      body.querySelector('#wheelResult').textContent="Memutar...";
+      setTimeout(()=>{
+        spinning=false;
+        const res=segments[target];
+        body.querySelector('#wheelResult').textContent=res.action();
+        spawnHearts(window.innerWidth/2,window.innerHeight/2);
+      },4100);
+    };
+  },{width:420,height:580});
+}
+
+/* ====== AI RIDHO ====== */
+function openAI(){
+  openWindow('ai','AI Ridho','fa-solid fa-robot',(body)=>{
+    body.innerHTML=`<div class="chat-box" style="height:100%">
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-quick">
+        <button data-q="lagi ngapain?">Ridho lagi ngapain?</button>
+        <button data-q="aku kangen">Aku kangen</button>
+        <button data-q="aku sedih">Aku sedih</button>
+        <button data-q="aku capek">Aku capek</button>
+        <button data-q="udah makan?">Udah makan?</button>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Ketik ke Ridho..." autocomplete="off">
+        <button id="chatSend"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>`;
+    const msgs=body.querySelector('#chatMsgs');
+    const input=body.querySelector('#chatInput');
+    const send=body.querySelector('#chatSend');
+    addMsg("bot","Hai Puput! Aku Ridho versi kecil. Mau ngobrol apa? 🤍");
+    function addMsg(t,text){
+      const m=document.createElement('div');
+      m.className='chat-msg '+t;
+      m.textContent=text;
+      msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;
+    }
+    function respond(text){
+      const low=text.toLowerCase();
+      let found=null;
+      for(const key in AI_RESPONSES){
+        if(low.includes(key)){found=rand(AI_RESPONSES[key]);break}
+      }
+      if(!found)found=rand(AI_DEFAULT);
+      setTimeout(()=>addMsg("bot",found),600+Math.random()*400);
+    }
+    function sendMsg(){
+      const v=input.value.trim();if(!v)return;
+      addMsg("user",v);input.value='';
+      respond(v);
+    }
+    send.onclick=sendMsg;
+    input.onkeydown=e=>{if(e.key==='Enter')sendMsg()};
+    body.querySelectorAll('.chat-quick button').forEach(b=>{
+      b.onclick=()=>{addMsg("user",b.dataset.q);respond(b.dataset.q)};
+    });
+  },{width:420,height:540});
+}
+
+/* ====== VIRTUAL PET ====== */
+function openPet(){
+  openWindow('pet','Virtual Pet','fa-solid fa-paw',(body)=>{
+    renderPetBody(body);
+  },{width:420,height:560});
+}
+function renderPetBody(body){
+  body.innerHTML=`<div class="app-pad">
+    <div class="app-h">🦫 Virtual Pet</div>
+    <div class="app-sub">Ini Capy. Rawat dia ya. Kalau lama gak dibuka, dia kangen kamu.</div>
+    <div class="pet-stage" id="petStage">
+      <div class="pet-bubble" id="petBubble">Hai Puput! 🤍</div>
+      <div class="pet-char" id="petChar">🦫</div>
+    </div>
+    <div class="pet-stats">
+      <div class="pet-stat"><div class="lbl">🍗 Lapar</div><div class="bar"><div class="fill" id="petHunger" style="width:${state.pet.hunger}%"></div></div></div>
+      <div class="pet-stat"><div class="lbl">😊 Bahagia</div><div class="bar"><div class="fill" id="petHappy" style="width:${state.pet.happy}%"></div></div></div>
+      <div class="pet-stat"><div class="lbl">⚡ Energi</div><div class="bar"><div class="fill" id="petEnergy" style="width:${state.pet.energy}%"></div></div></div>
+    </div>
+    <div class="pet-actions">
+      <button class="btn btn-primary" id="petFeed"><i class="fa-solid fa-utensils"></i> Kasih Makan</button>
+      <button class="btn btn-soft" id="petPet"><i class="fa-solid fa-hand-sparkles"></i> Elus</button>
+      <button class="btn btn-soft" id="petPlay"><i class="fa-solid fa-baseball"></i> Main</button>
+    </div>
+  </div>`;
+  const bubble=body.querySelector('#petBubble');
+  const char=body.querySelector('#petChar');
+  body.querySelector('#petFeed').onclick=()=>{
+    state.pet.hunger=Math.min(100,state.pet.hunger+20);
+    state.pet.lastFed=Date.now();
+    bubble.textContent="Nyam nyam! Makasih Puput 🍓";
+    char.textContent="🍎";
+    setTimeout(()=>char.textContent="🦫",1500);
+    spawnHearts(window.innerWidth/2,window.innerHeight/2);
+    updatePetUI(body);
+    savePet();
+  };
+  body.querySelector('#petPet').onclick=()=>{
+    state.pet.happy=Math.min(100,state.pet.happy+15);
+    state.pet.lastPet=Date.now();
+    bubble.textContent="Hehehe geli ah 🤭";
+    char.textContent="💕";
+    setTimeout(()=>char.textContent="🦫",1500);
+    spawnHearts(window.innerWidth/2,window.innerHeight/2);
+    updatePetUI(body);
+    savePet();
+  };
+  body.querySelector('#petPlay').onclick=()=>{
+    if(state.pet.energy<20){bubble.textContent="Aku capek, besok aja ya 😴";return}
+    state.pet.happy=Math.min(100,state.pet.happy+25);
+    state.pet.energy=Math.max(0,state.pet.energy-20);
+    bubble.textContent="Yay! Main lagi! 🎉";
+    char.textContent="🎈";
+    setTimeout(()=>char.textContent="🦫",1500);
+    spawnHearts(window.innerWidth/2,window.innerHeight/2);
+    updatePetUI(body);
+    savePet();
+  };
+}
+function updatePetUI(body){
+  if(!body.querySelector('#petHunger'))return;
+  body.querySelector('#petHunger').style.width=state.pet.hunger+'%';
+  body.querySelector('#petHappy').style.width=state.pet.happy+'%';
+  body.querySelector('#petEnergy').style.width=state.pet.energy+'%';
+}
+function savePet(){localStorage.setItem('puput_pet',JSON.stringify(state.pet))}
+function loadPet(){
+  const s=localStorage.getItem('puput_pet');
+  if(s){try{state.pet=JSON.parse(s)}catch(e){}}
+  // decay based on time
+  const now=Date.now();
+  const hours=(now-(state.pet.lastFed||now))/3600000;
+  state.pet.hunger=Math.max(0,state.pet.hunger-hours*5);
+  state.pet.happy=Math.max(0,state.pet.happy-hours*4);
+  state.pet.energy=Math.min(100,state.pet.energy+hours*3);
+  savePet();
+}
+function petIdleMessage(){
+  const msgs=["Aku kangen Puput...","Lama gak main ke aku 🥺","Kamu udah lupa aku ya?","Aku lapar nih...","Puput, temenin aku dong"];
+  const low=Math.min(state.pet.hunger,state.pet.happy);
+  if(low<30)return rand(["Aku kangen Puput banget... 🥺","Lupa sama aku ya?"]);
+  return rand(msgs);
+}
+ $('#petWidget').onclick=()=>openPet();
+setInterval(()=>{
+  // update widget tooltip
+  $('#petWidget').dataset.tip=petIdleMessage();
+  if(Object.keys(state.windows).includes('pet')&&!state.windows.pet.minimized){
+    const w=state.windows.pet.el;
+    const b=w.querySelector('#petBubble');
+    if(b&&Math.random()<0.3)b.textContent=petIdleMessage();
+  }
+},8000);
+
+/* ====== CALENDAR ====== */
+function openCalendar(){
+  openWindow('calendar','Calendar','fa-solid fa-calendar',(body)=>{
+    let viewDate=new Date();
+    function render(){
+      const y=viewDate.getFullYear(),m=viewDate.getMonth();
+      const first=new Date(y,m,1);
+      const startDay=first.getDay();
+      const daysInMonth=new Date(y,m+1,0).getDate();
+      const today=new Date();
+      const isThisMonth=y===today.getFullYear()&&m===today.getMonth();
+      const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      body.innerHTML=`<div class="app-pad">
+        <div class="app-h">📅 Calendar</div>
+        <div class="app-sub">Tanggal penting kita ada di sini. Kalau tanggal itu tiba, web berubah sendiri.</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0">
+          <button class="btn btn-soft" id="calPrev"><i class="fa-solid fa-chevron-left"></i></button>
+          <div style="font-family:'Caprasimo';font-size:18px">${months[m]} ${y}</div>
+          <button class="btn btn-soft" id="calNext"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="cal-grid">
+          ${['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(d=>`<div class="cal-head">${d}</div>`).join('')}
+          ${Array(startDay).fill('<div class="cal-cell empty"></div>').join('')}
+          ${Array.from({length:daysInMonth},(_,i)=>{
+            const day=i+1;
+            const isToday=isThisMonth&&day===today.getDate();
+            const special=IMPORTANT_DATES.find(d=>d.m===m&&d.d===day);
+            const cls='cal-cell'+(isToday?' today':'')+(special?' special':'');
+            return `<div class="${cls}" data-day="${day}" data-special="${special?special.label:''}">${day}</div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:14px;padding:12px;background:var(--glass);border-radius:10px">
+          <strong style="color:var(--accent)">Tanggal penting bulan ini:</strong>
+          <div id="calImportant" style="margin-top:8px;font-size:13px"></div>
+        </div>
+      </div>`;
+      const imp=body.querySelector('#calImportant');
+      const monthImp=IMPORTANT_DATES.filter(d=>d.m===m);
+      if(monthImp.length===0)imp.innerHTML='<em style="color:var(--text-soft)">Tidak ada tanggal spesial bulan ini.</em>';
+      else imp.innerHTML=monthImp.map(d=>`<div style="margin:4px 0">❤️ ${d.d} ${months[m]} — ${d.label}</div>`).join('');
+      body.querySelectorAll('.cal-cell:not(.empty)').forEach(c=>{
+        c.onclick=()=>{
+          const sp=c.dataset.special;
+          if(sp){
+            toast(`❤️ ${sp}`);
+            spawnHearts(c.getBoundingClientRect().left+20,c.getBoundingClientRect().top+20);
+            // special today?
+            const today=new Date();
+            if(isThisMonth&&parseInt(c.dataset.day)===today.getDate()){
+              setTimeout(()=>{
+                openWindow('calSpecial','Hari Spesial!','fa-solid fa-heart',(b)=>{
+                  b.innerHTML=`<div class="app-pad" style="text-align:center">
+                    <div style="font-size:60px">🎉</div>
+                    <h2 style="font-family:'Caprasimo';color:var(--accent);margin:10px 0">${sp}</h2>
+                    <p style="font-family:'Caveat';font-size:22px">Selamat! Hari ini adalah hari spesial kita. Aku bahagia karena ada kamu.</p>
+                    <p style="margin-top:10px">— Ridho 🤍</p>
+                  </div>`;
+                },{width:400,height:380});
+              },400);
+            }
+          }else{
+            toast(`${c.dataset.day} ${months[m]} ${y}`);
+          }
+        };
+      });
+      body.querySelector('#calPrev').onclick=()=>{viewDate=new Date(y,m-1,1);render()};
+      body.querySelector('#calNext').onclick=()=>{viewDate=new Date(y,m+1,1);render()};
+    }
+    render();
+  },{width:480,height:540});
+}
+
+/* ====== NOTES ====== */
+function openNotes(){
+  openWindow('notes','Notes — Surat','fa-solid fa-note-sticky',(body)=>{
+    body.innerHTML=`<div class="notes-list" id="notesList"></div>`;
+    const list=body.querySelector('#notesList');
+    NOTES.forEach((n,i)=>{
+      const el=document.createElement('div');
+      el.className='note-item';
+      el.innerHTML=`<strong>${n.title}</strong><div class="from">— dari Ridho, klik untuk baca</div>`;
+      el.onclick=()=>openNote(n);
+      list.appendChild(el);
+    });
+  },{width:440,height:480});
+}
+function openNote(n){
+  openWindow('note'+n.title,'Surat: '+n.title,'fa-solid fa-envelope',(body)=>{
+    body.innerHTML=`<div class="note-detail">${n.body}
+      <p style="margin-top:24px;text-align:right;font-family:'Space Grotesk';font-size:13px;color:var(--text-soft)">— Ridho 🤍</p>
+    </div>`;
+  },{width:440,height:480});
+}
+
+/* ====== RECYCLE BIN ====== */
+function openRecycle(){
+  openWindow('recyclebin','Recycle Bin','fa-solid fa-trash',(body)=>{
+    body.innerHTML=`<div class="app-pad">
+      <div class="app-h">🗑 Recycle Bin</div>
+      <div class="app-sub">Hal-hal yang pernah aku simpan tapi udah gak kepake. Klik untuk lihat.</div>
+      <div id="recycleList"></div>
+    </div>`;
+    const list=body.querySelector('#recycleList');
+    if(RECYCLE.length===0){
+      list.innerHTML='<div class="recycle-empty"><i class="fa-solid fa-trash"></i><p>Recycle bin kosong</p></div>';
+      return;
+    }
+    RECYCLE.forEach((r,i)=>{
+      const el=document.createElement('div');
+      el.className='recycle-item';
+      el.innerHTML=`<div class="ico">${r.ico}</div><div><div style="font-weight:600;font-size:13px">${r.name}</div></div>`;
+      el.onclick=()=>{
+        openWindow('recycleItem'+i,'Item: '+r.name,'fa-solid fa-trash',(b)=>{
+          b.innerHTML=`<div class="app-pad" style="text-align:center">
+            <div style="font-size:50px;margin:10px">${r.ico}</div>
+            <h3 style="font-family:'Caprasimo';color:var(--accent);margin-bottom:10px">${r.name}</h3>
+            <p style="font-family:'Caveat';font-size:20px;line-height:1.5">${r.content}</p>
+          </div>`;
+        },{width:400,height:340});
+      };
+      list.appendChild(el);
+    });
+  },{width:480,height:440});
+}
+
+/* ============ SLEEP MODE ============ */
+function checkNightMode(){
+  const night=isNightTime();
+  if(night!==state.isNight){
+    state.isNight=night;
+    document.body.classList.toggle('night',night);
+    $('#modeIndicator').innerHTML=night?'<i class="fa-solid fa-moon"></i> Mode Malam':'<i class="fa-solid fa-sun"></i> Mode Siang';
+    if(night){
+      // auto-prompt sleep mode after 22:00 (once per session)
+      if(!sessionStorage.getItem('sleepPrompted')){
+        sessionStorage.setItem('sleepPrompted','1');
+        setTimeout(()=>{
+          toast("🌙 Sudah malam, Puput. Mode tidur aktif.",3000);
+          activateSleepMode(true);
+        },2000);
+      }
+    }
+  }
+}
+function activateSleepMode(auto){
+  if(state.isSleepMode)return;
+  state.isSleepMode=true;
+  const overlay=$('#sleepOverlay');
+  overlay.classList.add('active');
+  $('#sleepStory').textContent=rand(STORIES);
+  // rain sound
+  startRain();
+  if(auto){
+    $('#sleepTitle').textContent="🌙 Selamat malam, Puput";
+  }else{
+    $('#sleepTitle').textContent="🌙 Mode Tidur — Tenangin dikali ya";
+  }
+}
+function deactivateSleepMode(){
+  state.isSleepMode=false;
+  $('#sleepOverlay').classList.remove('active');
+  stopRain();
+}
+let rainAudio=null,rainCtx=null;
+function startRain(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  rainCtx=audioCtx;
+  // pink noise approximation
+  const bufferSize=2*audioCtx.sampleRate;
+  const buffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
+  const data=buffer.getChannelData(0);
+  let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(let i=0;i<bufferSize;i++){
+    const white=Math.random()*2-1;
+    b0=0.99886*b0+white*0.0555179;
+    b1=0.99332*b1+white*0.0750759;
+    b2=0.96900*b2+white*0.1538520;
+    b3=0.86650*b3+white*0.3104856;
+    b4=0.55000*b4+white*0.5329522;
+    b5=-0.7616*b5-white*0.0168980;
+    data[i]=(b0+b1+b2+b3+b4+b5+b6+white*0.5362)*0.11;
+    b6=white*0.115926;
+  }
+  const src=audioCtx.createBufferSource();src.buffer=buffer;src.loop=true;
+  const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=800;
+  const gain=audioCtx.createGain();gain.gain.value=0.4;
+  src.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);
+  src.start();
+  rainAudio={src,gain};
+  // canvas rain
+  drawRain();
+}
+function stopRain(){
+  if(rainAudio){
+    try{rainAudio.src.stop()}catch(e){}
+    rainAudio=null;
+  }
+  if(rainCtx)rainCtx=null;
+}
+function drawRain(){
+  const canvas=$('#rainCanvas');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const drops=[];
+  for(let i=0;i<200;i++)drops.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,l:10+Math.random()*20,v:5+Math.random()*5});
+  function loop(){
+    if(!state.isSleepMode)return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle='rgba(174,194,224,0.6)';ctx.lineWidth=1;
+    drops.forEach(d=>{
+      ctx.beginPath();ctx.moveTo(d.x,d.y);ctx.lineTo(d.x,d.y+d.l);ctx.stroke();
+      d.y+=d.v;
+      if(d.y>canvas.height){d.y=-d.l;d.x=Math.random()*canvas.width}
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+ $('#sleepToggle').onclick=()=>{
+  if(state.isSleepMode)deactivateSleepMode();
+  else activateSleepMode(false);
+};
+ $('#sleepClose').onclick=()=>{
+  deactivateSleepMode();
+  // show a sweet note
+  setTimeout(()=>openWindow('sleepNight','🌙 Tidur Tenang','fa-solid fa-moon',(body)=>{
+    body.innerHTML=`<div class="app-pad" style="text-align:center">
+      <div style="font-size:60px">🌙</div>
+      <h2 style="font-family:'Caprasimo';color:var(--accent);margin:10px 0">Selamat tidur, Puput</h2>
+      <p style="font-family:'Caveat';font-size:22px;line-height:1.6">Tarik napas pelan. Lepas. Aku di sini. Aku simpen kamu dalam doa kecilku malam ini.</p>
+      <p style="margin-top:14px;font-size:13px;color:var(--text-soft)">— Ridho 🤍</p>
+    </div>`;
+  },{width:420,height:380}),300);
+};
+
+/* ============ STARS BACKGROUND ============ */
+function makeStars(){
+  const c=$('#stars');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const size=Math.random()*2+1;
+    s.style.width=size+'px';s.style.height=size+'px';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    c.appendChild(s);
+  }
+}
+
+/* ============ CLOCK ============ */
+function updateClock(){
+  const d=new Date();
+  const hh=String(d.getHours()).padStart(2,'0');
+  const mm=String(d.getMinutes()).padStart(2,'0');
+  $('#topClock').textContent=`${hh}:${mm}`;
+  $('#taskbarTime').textContent=`${hh}:${mm}`;
+  $('#taskbarDate').textContent=formatDate(d);
+}
+
+/* ============ START BUTTON ============ */
+ $('#startBtn').onclick=e=>{
+  e.stopPropagation();
+  const m=$('#startMenu');
+  const btn=$('#startBtn');
+  m.classList.toggle('open');
+  btn.classList.toggle('active');
+};
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#startMenu')&&!e.target.closest('#startBtn')){
+    $('#startMenu').classList.remove('open');
+    $('#startBtn').classList.remove('active');
+  }
+});
+
+/* ============ INIT ============ */
+function init(){
+  buildDesktopIcons();
+  buildStartMenu();
+  makeStars();
+  loadPet();
+  updateClock();
+  setInterval(updateClock,1000);
+  checkNightMode();
+  setInterval(checkNightMode,60000);
+  // welcome
+  setTimeout(()=>{
+    toast("🤍 Selamat datang di Puput OS, dibuat sama Ridho buat kamu.");
+  },800);
+  // check special date
+  const today=new Date();
+  const special=IMPORTANT_DATES.find(d=>d.m===today.getMonth()&&d.d===today.getDate());
+  if(special){
+    setTimeout(()=>{
+      openWindow('welcomeSpecial','Hari Spesial!','fa-solid fa-heart',(body)=>{
+        body.innerHTML=`<div class="app-pad" style="text-align:center">
+          <div style="font-size:60px">🎉</div>
+          <h2 style="font-family:'Caprasimo';color:var(--accent);margin:10px 0">${special.label}</h2>
+          <p style="font-family:'Caveat';font-size:22px">Hari ini hari spesial kita, Puput. Aku bahagia karena ada kamu di hidupku.</p>
+        </div>`;
+      },{width:420,height:380});
+    },2500);
+  }
+}
+init();
+</script>
+</body>
+</html>
